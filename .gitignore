@@ -1,14 +1,15 @@
 ### Elixir ###
-/university_prerequisite_backend/_build
-/university_prerequisite_backend/cover
-/university_prerequisite_backend/deps
-/university_prerequisite_backend/doc
-/university_prerequisite_backend/.fetch
-/university_prerequisite_backend/erl_crash.dump
-/university_prerequisite_backend/*.ez
-/university_prerequisite_backend/*.beam
-/university_prerequisite_backend/config/*.secret.exs
-/university_prerequisite_backend/.elixir_ls/
+/api/_build
+/api/cover
+/api/deps
+/api/doc
+/api/.fetch
+/api/erl_crash.dump
+/api/*.ez
+/api/*.beam
+/api/config/*.secret.exs
+/api/.elixir_ls/
+**/*.secret.exs
 
 ### Elixir Patch ###
 
