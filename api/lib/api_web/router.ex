@@ -8,7 +8,8 @@ defmodule ApiWeb.Router do
   scope "/", ApiWeb do
     pipe_through :api
 
-    get "/task", TaskController, :index
+    get "/task/:org", TaskController, :allOrgTasks
+    get "/task/", TaskController, :allTasks
   end
 
   # # Enables LiveDashboard only for development
