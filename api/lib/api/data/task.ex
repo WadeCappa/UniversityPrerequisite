@@ -8,7 +8,7 @@ defmodule Api.Task do
     field :parent_org, :integer
     field :slot_weight, :integer
     field :subject, :string
-    field :task_id, :integer
+    field :task_id, :integer 
     field :title, :string
   end
 
