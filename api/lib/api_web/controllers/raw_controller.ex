@@ -1,12 +1,10 @@
 defmodule ApiWeb.RawController do
   use ApiWeb, :controller
 
-  def allOrgTasks(conn, %{"org" => org} = params) do
+  def allOrgTasks(conn, %{"org" => org} = _params) do
     query =
       "SELECT subject, number, task.title, task.description, slot_weight
-      FROM task, organization
-      WHERE organization.title = '#{org}'
-      AND parent_org = organization_id;"
+      FROM task WHERE parent_org = #{org};"
 
     json(conn, %{res: query |> Api.DatabaseManager.resolveQuery})
   end
@@ -16,17 +14,17 @@ defmodule ApiWeb.RawController do
     json(conn, %{res: query |> Api.DatabaseManager.resolveQuery})
   end
 
-  def allOrgObjectives(conn, %{"org" => org} = params) do
+  def allOrgObjectives(conn, %{"org" => org} = _params) do
     query =
       "SELECT objective_id, parent_org, ob.title, ob.description
-      FROM objective as ob, organization
+      FROM objective as ob
       WHERE organization.title = '#{org}'
       AND parent_org = organization_id;"
 
     json(conn, %{res: query |> Api.DatabaseManager.resolveQuery})
   end
 
-  def simplifiedTasks(conn, %{"org" => org} = params) do
+  def simplifiedTasks(conn, %{"org" => org} = _params) do
     query =
       "SELECT subject, number
       FROM task, organization
@@ -36,7 +34,7 @@ defmodule ApiWeb.RawController do
     json(conn, %{res: query |> Api.DatabaseManager.resolveQuery})
   end
 
-  def getTask(conn, %{"subject" => subject, "number" => number} = params) do
+  def getTask(conn, %{"subject" => subject, "number" => number} = _params) do
     query =
       "SELECT subject, number, task.title, task.description, slot_weight
       FROM task

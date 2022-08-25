@@ -11,5 +11,59 @@
 /api/.elixir_ls/
 **/*.secret.exs
 
-### Elixir Patch ###
+### Scala ###
+/api_v2/lib/*.jar
+/api_v2/test/files/codelib/*.jar
+/api_v2/test/files/lib/*.jar
+/api_v2/test/files/speclib/instrumented.jar
+/api_v2/tools/*.jar
 
+# Developer specific properties
+/api_v2/build.properties
+/api_v2/buildcharacter.properties
+
+# might get generated when testing Jenkins scripts locally
+/api_v2/jenkins.properties
+
+# target directory for build
+/api_v2/build/
+
+# other
+/api_v2/out/
+/api_v2/bin/
+/api_v2/sandbox/
+
+# intellij
+/api_v2/src/intellij*/*.iml
+/api_v2/src/intellij*/*.ipr
+/api_v2/src/intellij*/*.iws
+/api_v2/**/.cache
+/api_v2/.idea
+/api_v2/.settings
+
+# vscode
+/api_v2/.vscode
+
+# Standard symbolic link to build/quick/bin
+/api_v2/qbin
+
+# sbt's target directories
+/api_v2/target/
+/api_v2/project/**/target/
+/api_v2/test/macro-annot/target/
+/api_v2/test/files/target/
+/api_v2/test/target/
+/api_v2/build-sbt/
+/api_v2/local.sbt
+/api_v2/jitwatch.out
+
+# Used by the restarr/restarrFull commands as target directories
+/api_v2/build-restarr/
+/api_v2/target-restarr/
+
+# metals
+/api_v2/.metals
+/api_v2/.bloop
+api_v2/project/**/metals.sbt
+
+api_v2/.bsp
