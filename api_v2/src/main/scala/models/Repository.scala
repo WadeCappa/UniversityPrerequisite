@@ -1,5 +1,5 @@
 package models
 
-case class Repository(
-  repo_id: Int
-)
+trait Repository {
+  val repo_id: Int
+}

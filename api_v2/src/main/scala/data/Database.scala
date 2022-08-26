@@ -5,6 +5,8 @@ import doobie.util.ExecutionContexts
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
 
+import models.{Executable, Objective, Task}
+
 object DatabaseFactory {
   def newDatabase(): Aux[IO, Unit] = {
     implicit val cs = IO.contextShift(ExecutionContexts.synchronous)

@@ -1,5 +1,5 @@
 package models
 
-case class Executable(
-  executable_id: Int
-)
+trait Executable {
+  val executable_id: Int
+}

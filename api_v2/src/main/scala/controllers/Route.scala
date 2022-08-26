@@ -1,4 +1,4 @@
 package controllers
 
-// TODO: Use this to generlize your routing objects. Will help you prevent useless repeated code.
+// TODO: Use this to generalize your routing objects. Will help you prevent useless repeated code.
 trait Route {}

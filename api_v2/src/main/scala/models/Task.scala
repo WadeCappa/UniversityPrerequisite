@@ -8,4 +8,6 @@ case class Task(
   slot_weight: Option[Int],
   title: Option[String],
   description: Option[String]
-) extends Executable(executable_id = task_id)
+) extends Executable {
+  override val executable_id: Int = task_id
+}
