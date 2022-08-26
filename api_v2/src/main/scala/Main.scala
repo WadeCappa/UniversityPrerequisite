@@ -2,46 +2,26 @@ package main.scala
 
 import com.twitter.finagle.{Http, ListeningServer}
 import com.twitter.util.Future
-
-import cats.effect.{IO, IOApp, Blocker, ExitCode, Resource}
-import cats.effect.syntax._
-
+import cats.effect.{ExitCode, IO, IOApp, Resource}
 import io.finch._
-import io.finch.catsEffect._
 import io.finch.circe._
-
 import io.circe.generic.auto._
+import doobie.util.transactor.Transactor.Aux
 
-import doobie.util.ExecutionContexts
-import doobie.util.transactor.Transactor
-import doobie._
-import doobie.implicits._
-
-import main.scala.models.Task
+import main.scala.controllers.View
+import main.scala.data.DatabaseFactory
 
 object Main extends IOApp {
-  implicit val cs = IO.contextShift(ExecutionContexts.synchronous)
 
-  val xa = Transactor.fromDriverManager[IO](
-    "org.postgresql.Driver",     // driver classname
-    "jdbc:postgresql:university_prereq",     // connect URL (driver-specific)
-    "postgres",                  // user
-    "postgres",                           // password
-  )
+  // TODO: Add the ability to pass args to this from the command line, will be important for future configurations
+  val db: Aux[IO, Unit] = DatabaseFactory.newDatabase()
 
-  val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
-    for {
-      courses <- sql"select * from task"
-        .query[Task]
-        .to[Seq]
-        .transact(xa)
-    } yield Ok(courses)
+  def startServer: IO[ListeningServer] = {
+    // TODO: Reduce the number of times you repeat yourself here. Each route must be declared in a controller, declared
+    //  in it's case class, and then individually referenced in the .serve() call. This is bad.
+    val viewRoutes = View.buildRoutes(db)
+    IO(Http.server.serve(":8081", (viewRoutes.getCourses :+: viewRoutes.test).toServiceAs[Application.Json]))
   }
-
-  val test: Endpoint[IO, String] = get("test") { Ok("Hello, World!") } 
-
-  def startServer: IO[ListeningServer] =
-    IO(Http.server.serve(":8081",  (test :+: getCourses) .toServiceAs[Application.Json]))
 
   def run(args: List[String]): IO[ExitCode] = {
     val server = Resource.make(startServer)(s =>
@@ -51,6 +31,6 @@ object Main extends IOApp {
     server.use(_ => IO.never).as(ExitCode.Success)
   }
 
+  // TODO: Figure out how to run the server from the command line
   run(List[String]())
-
 }
