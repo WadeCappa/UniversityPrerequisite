@@ -8,8 +8,7 @@ import io.finch.circe._
 import io.circe.generic.auto._
 import doobie.implicits._
 import models._
-
-import doobie.util.transactor.Transactor.Aux
+import shapeless._
 
 case class ViewRoutes(
   getCourses: Endpoint[IO, Seq[Task]],
@@ -18,7 +17,9 @@ case class ViewRoutes(
 )
 
 object View extends Route {
-  def buildRoutes(dbManager: DBManager): ViewRoutes = {
+  // TODO: Make this return type generic. I don't want to have to type out this garbage just to add a new route. This
+  //  needs to be streamlined, I want to repeat myself less.
+  def buildRoutes(dbManager: DBManager): io.finch.Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
 
     val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
       dbManager.query[Task](sql"select * from task")
@@ -34,6 +35,6 @@ object View extends Route {
       )
     }
 
-    ViewRoutes(getCourses, getOrgs, getObjectives)
+    getCourses :+: getOrgs :+: getObjectives
   }
 }

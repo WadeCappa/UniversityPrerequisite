@@ -4,13 +4,11 @@ import cats.effect.{Blocker, IO}
 import doobie.util.ExecutionContexts
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
-import doobie.syntax.SqlInterpolator
 import doobie.util.fragment.Fragment
 import doobie.util.Read
 
 import io.finch._
 import doobie.implicits._
-import models._
 
 case class DBManager(db: Aux[IO, Unit]) {
 
