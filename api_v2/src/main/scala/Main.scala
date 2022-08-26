@@ -8,8 +8,8 @@ import io.finch.circe._
 import io.circe.generic.auto._
 import doobie.util.transactor.Transactor.Aux
 
-import main.scala.controllers.View
-import main.scala.data.DatabaseFactory
+import controllers.View
+import apiData.DatabaseFactory
 
 object Main extends IOApp {
 

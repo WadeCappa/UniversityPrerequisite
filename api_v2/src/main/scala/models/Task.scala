@@ -1,4 +1,4 @@
-package main.scala.models
+package models
 
 case class Task(
   task_id: Int,
@@ -8,4 +8,4 @@ case class Task(
   slot_weight: Option[Int],
   title: Option[String],
   description: Option[String]
-)
+) extends Executable(executable_id = task_id)

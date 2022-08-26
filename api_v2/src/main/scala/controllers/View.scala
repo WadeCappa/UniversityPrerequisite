@@ -1,10 +1,10 @@
-package main.scala.controllers
+package controllers
 
 import cats.effect.IO
 import io.finch.{Endpoint, _}
 import io.finch.catsEffect._
 import doobie.implicits._
-import main.scala.models.Task
+import models.Task
 import doobie.util.transactor.Transactor.Aux
 
 case class ViewRoutes(

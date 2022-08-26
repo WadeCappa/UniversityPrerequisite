@@ -9,4 +9,7 @@
 		2) new/updated Course
 			1) Check to see if it is valid and doesn't create cycles in database (neo4j might be able to do this automatically in the future)
 	5) Eventually transition over to NEO4J instead of PostgreSQL  
-		
+2) Make scripts to auto populate the database. Use the models you declared in the backend. 
+	1) The scripts should be able to be launched from sbt with a special keyword
+	
+sudo -u postgres psql	

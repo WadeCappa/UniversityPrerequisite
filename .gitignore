@@ -65,5 +65,6 @@
 /api_v2/.metals
 /api_v2/.bloop
 api_v2/project/**/metals.sbt
+/api_v2/.attach_pid1355
 
 api_v2/.bsp

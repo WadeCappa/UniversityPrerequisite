@@ -1,4 +1,4 @@
-package main.scala.data
+package apiData
 
 import cats.effect.{Blocker, IO}
 import doobie.util.ExecutionContexts
