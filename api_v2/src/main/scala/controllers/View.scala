@@ -7,7 +7,10 @@ import doobie.implicits._
 import main.scala.models.Task
 import doobie.util.transactor.Transactor.Aux
 
-case class ViewRoutes(getCourses: Endpoint[IO, Seq[Task]], test: Endpoint[IO, String])
+case class ViewRoutes(
+  getCourses: Endpoint[IO, Seq[Task]],
+  test: Endpoint[IO, String]
+)
 
 object View extends Route {
   def buildRoutes(db: Aux[IO, Unit]): ViewRoutes = {
