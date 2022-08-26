@@ -1,5 +1,5 @@
 package models
 
-trait Executable {
+trait Executable extends Model {
   val executable_id: Int
 }

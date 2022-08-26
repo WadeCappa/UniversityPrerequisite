@@ -1,5 +1,5 @@
 package models
 
-trait Repository {
+trait Repository extends Model {
   val repo_id: Int
 }

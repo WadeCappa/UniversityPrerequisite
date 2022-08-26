@@ -4,8 +4,25 @@ import cats.effect.{Blocker, IO}
 import doobie.util.ExecutionContexts
 import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
+import doobie.syntax.SqlInterpolator
+import doobie.util.fragment.Fragment
+import doobie.util.Read
 
-import models.{Executable, Objective, Task}
+import io.finch._
+import doobie.implicits._
+import models._
+
+case class DBManager(db: Aux[IO, Unit]) {
+
+  def query[A: Read](sql: Fragment): IO[Output[Seq[A]]] = {
+    for {
+      res <- sql
+        .query[A]
+        .to[Seq]
+        .transact(db)
+    } yield Ok(res)
+  }
+}
 
 object DatabaseFactory {
   def newDatabase(): Aux[IO, Unit] = {

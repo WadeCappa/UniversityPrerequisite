@@ -9,17 +9,17 @@ import io.circe.generic.auto._
 import doobie.util.transactor.Transactor.Aux
 
 import controllers.View
-import apiData.DatabaseFactory
+import apiData._
 
 object Main extends IOApp {
 
   // TODO: Add the ability to pass args to this from the command line, will be important for future configurations
-  val db: Aux[IO, Unit] = DatabaseFactory.newDatabase()
+  val dbManager = DBManager(DatabaseFactory.newDatabase())
 
   def startServer: IO[ListeningServer] = {
     // TODO: Reduce the number of times you repeat yourself here. Each route must be declared in a controller, declared
     //  in it's case class, and then individually referenced in the .serve() call. This is bad.
-    val viewRoutes = View.buildRoutes(db)
+    val viewRoutes = View.buildRoutes(dbManager)
     IO(
       Http.server.serve(
         ":8081",
