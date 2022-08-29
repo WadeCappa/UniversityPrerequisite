@@ -19,14 +19,14 @@ case class ViewRoutes(
 object View extends Route {
   // TODO: Make this return type generic. I don't want to have to type out this garbage just to add a new route. This
   //  needs to be streamlined, I want to repeat myself less.
-  def buildRoutes(dbManager: DBManager): io.finch.Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
+  def buildRoutes(dbManager: DBManager): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
 
     val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
       dbManager.query[Task](sql"select * from task")
     }
 
     val getOrgs: Endpoint[IO, Seq[Org]] = get("orgs") {
-      dbManager.query[Org](sql"select * from organization")
+      dbManager.getOrgs()
     }
 
     val getObjectives: Endpoint[IO, Seq[Objective]] = get("objective" :: jsonBody[Org]) { org: Org =>
