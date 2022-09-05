@@ -39,30 +39,21 @@ case class DBManager(db: Aux[IO, Unit]) {
         (task.task_id, task)
       }.toMap
 
-    val pathsRough = (rawData[(Int, Int, Int)](
+    val paths: Map[Int, List[List[Int]]] = (rawData[(Int, Int, Int)](
       sql"select parent_id, path_id, child_executable_id from path, task, in_path where path.parent_id = task.task_id and task.parent_org = ${org.organization_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
     ) ++ rawData[(Int, Int, Int)](
       sql"select objective_id, path_id, child_executable_id from path, objective, in_path where path.parent_id = objective.objective_id and objective.parent_org = ${org.organization_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
-    ))
-
-    Console.println(pathsRough)
-    Console.println(
-      s"At ${objectives.head.executable_id} -> ${pathsRough.find((p) => p._1 == objectives.head.executable_id)}"
-    )
-
-    val paths =
-      pathsRough
-        .foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
-          p._1.exists(_ == data._1) match {
-            case false => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
-            case true =>
-              p._2.contains(data._2) match {
-                case false => (p._1 + (data._1 -> (List[Int](data._3) :: p._1(data._1))), p._2 + data._2)
-                case true  => (p._1 + (data._1 -> ((data._3 :: p._1(data._1).last) :: p._1(data._1).init)), p._2)
-              }
-          }
+    )).foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
+        p._1.get(data._1) match {
+          case None => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
+          case Some(_) =>
+            p._2.contains(data._2) match {
+              case false => (p._1 + (data._1 -> (List[Int](data._3) :: p._1(data._1))), p._2 + data._2)
+              case true  => (p._1 + (data._1 -> ((data._3 :: p._1(data._1).last) :: p._1(data._1).init)), p._2)
+            }
         }
-        ._1
+      }
+      ._1
 
     Console.println(paths)
     Console.println(
@@ -85,19 +76,36 @@ case class DBManager(db: Aux[IO, Unit]) {
                 seen,
                 res + (last._2 -> res(last._2).copy(parent_id = last._1 :: res(last._2).parent_id))
               )
-            case false =>
+            case false => {
+              val ps = paths.get(last._2) match {
+                case Some(ps) => ps
+                case None     => List()
+              }
               buildNodes(
-                init ++ paths(last._2).flatten.map(exe_id => (last._2, exe_id)),
+                init ++ ps.flatten.map(exe_id => (last._2, exe_id)),
                 seen + last._2,
-                res + (last._2 -> DataNode[Task](courses(last._2), List(last._1), paths(last._2)))
+                res + (last._2 -> DataNode[Task](courses(last._2), List(last._1), ps))
               )
+            }
           }
         }
         case _ => { res }
       }
     }
 
-    buildNodes(objectives.map(exe => (0, exe.executable_id)))
+    val data = objectives.foldLeft(List[(Int, Int)]()) { (ac, o) =>
+      paths.get(o.executable_id) match {
+        case None        => ac
+        case Some(lists) => lists.flatten.map(task => (o.executable_id, task)) ++ ac
+      }
+    }
+
+    Console.println(data)
+    Console.println(
+      s"At ${data.head} -> ${paths(data.head._2)}"
+    )
+
+    buildNodes(data)
   }
 
   def rawData[A: Read](sql: Fragment): List[A] = {
