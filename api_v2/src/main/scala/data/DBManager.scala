@@ -10,10 +10,7 @@ import io.finch._
 import doobie.implicits._
 import models._
 
-import scala.collection.mutable
-
 case class DBManager(db: Aux[IO, Unit]) {
-
   def getOrgs(): IO[Output[Seq[Org]]] = {
     query[Org](sql"select * from organization")
   }
@@ -24,25 +21,22 @@ case class DBManager(db: Aux[IO, Unit]) {
     )
   }
 
-  // TODO: Given an executable, return a tree which relates each returned course to it's pre-requisites as its
-  //  children. This will be the minimal required data structure to return to the user to provide value. For use
-  //  when the user goes to first start a schedule.
-  // def getCourses(exe: Executable): IO[Output[ExecutableTree]] = {}
-
   // TODO: Builds a tree. Not nearly as efficent as it should be. The database should do this for you instead of this
   //  terrible work-a-round. Eventually move to Neo4j. For now this works as a POC
 
   // TODO: This function is terribly inefficent. You need to rework this, Neo4j might be your solution.
-  def getAllCoursesInPath(org: Org, objectives: List[Executable]): Map[Int, DataNode[Task]] = {
+  def getAllCoursesInPath(org_id: Int, objectives: List[Int]): Map[Int, DataNode[Task]] = {
     val courses: Map[Int, Task] =
-      rawData[Task](sql"select * from task where parent_org = ${org.organization_id}").map { task =>
+      rawData[Task](sql"select * from task where parent_org = ${org_id}").map { task =>
         (task.task_id, task)
       }.toMap
 
+    // TODO: Using tuples everywhere is terrible design. If you could get your database (neo4j) to do this for you
+    //  it would be based.
     val paths: Map[Int, List[List[Int]]] = (rawData[(Int, Int, Int)](
-      sql"select parent_id, path_id, child_executable_id from path, task, in_path where path.parent_id = task.task_id and task.parent_org = ${org.organization_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
+      sql"select parent_id, path_id, child_executable_id from path, task, in_path where path.parent_id = task.task_id and task.parent_org = ${org_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
     ) ++ rawData[(Int, Int, Int)](
-      sql"select objective_id, path_id, child_executable_id from path, objective, in_path where path.parent_id = objective.objective_id and objective.parent_org = ${org.organization_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
+      sql"select objective_id, path_id, child_executable_id from path, objective, in_path where path.parent_id = objective.objective_id and objective.parent_org = ${org_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
     )).foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
         p._1.get(data._1) match {
           case None => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
@@ -54,11 +48,6 @@ case class DBManager(db: Aux[IO, Unit]) {
         }
       }
       ._1
-
-    Console.println(paths)
-    Console.println(
-      s"At ${objectives.head.executable_id} -> ${paths(objectives.head.executable_id)}"
-    )
 
     // TODO: The absolute state of this entire function man ...
     def buildNodes(
@@ -93,19 +82,12 @@ case class DBManager(db: Aux[IO, Unit]) {
       }
     }
 
-    val data = objectives.foldLeft(List[(Int, Int)]()) { (ac, o) =>
-      paths.get(o.executable_id) match {
+    buildNodes(objectives.foldLeft(List[(Int, Int)]()) { (ac, o) =>
+      paths.get(o) match {
         case None        => ac
-        case Some(lists) => lists.flatten.map(task => (o.executable_id, task)) ++ ac
+        case Some(lists) => lists.flatten.map(task => (o, task)) ++ ac
       }
-    }
-
-    Console.println(data)
-    Console.println(
-      s"At ${data.head} -> ${paths(data.head._2)}"
-    )
-
-    buildNodes(data)
+    })
   }
 
   def rawData[A: Read](sql: Fragment): List[A] = {
@@ -113,6 +95,7 @@ case class DBManager(db: Aux[IO, Unit]) {
       .query[A]
       .to[List]
       .transact(db)
+      // TODO: Figure out how to make this run safely, not a particularly good idea to run it like this.
       .unsafeRunSync()
   }
 
