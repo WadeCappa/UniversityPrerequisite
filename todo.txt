@@ -1,7 +1,7 @@
 1) Rebuild backend with Scala
-	1) Connect PostgreSQL database
-	2) Build data-fetching (and cleaning) singleton
-	3) Build routes to send data in JSON
+	1) Connect PostgreSQL database -> done
+	2) Build data-fetching (and cleaning) singleton -> done
+	3) Build routes to send data in JSON -> done
 	4) Build data-receiving and processing singleton
 		1) New/updated Schedule
 			1) Check to see if input schedule has cycle
@@ -12,4 +12,6 @@
 2) Make scripts to auto populate the database. Use the models you declared in the backend. 
 	1) The scripts should be able to be launched from sbt with a special keyword
 	
+3) Add scala tests, this is great practice for industry
+
 sudo -u postgres psql	

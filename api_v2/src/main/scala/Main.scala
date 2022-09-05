@@ -6,7 +6,7 @@ import cats.effect.{ExitCode, IO, IOApp, Resource}
 import io.finch._
 import io.finch.circe._
 import io.circe.generic.auto._
-import controllers.View
+import controllers.ViewFactory
 import apiData._
 
 object Main extends IOApp {
@@ -17,7 +17,7 @@ object Main extends IOApp {
   def startServer: IO[ListeningServer] = {
     // TODO: Reduce the number of times you repeat yourself here. Each route must be declared in a controller, returned
     //  in an easy to manipulate format, and the combined with the other controllers
-    IO(Http.server.serve(":8081", View.buildRoutes(dbManager).toServiceAs[Application.Json]))
+    IO(Http.server.serve(":8081", ViewFactory.getRoutes(dbManager).toServiceAs[Application.Json]))
   }
 
   def run(args: List[String]): IO[ExitCode] = {

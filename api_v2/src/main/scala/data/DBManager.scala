@@ -6,38 +6,32 @@ import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
 import doobie.util.fragment.Fragment
 import doobie.util.Read
-import io.finch._
+import doobie.ConnectionIO
 import doobie.implicits._
 import models._
 
 case class DBManager(db: Aux[IO, Unit]) {
-  def getOrgs(): IO[Output[Seq[Org]]] = {
-    query[Org](sql"select * from organization")
-  }
-
-  def getObjectives(org: Org): IO[Output[Seq[Objective]]] = {
-    query[Objective](
-      sql"select objective_id, parent_org, objective.title, objective.description from objective, organization where objective.parent_org = ${org.organization_id}"
-    )
-  }
 
   // TODO: Builds a tree. Not nearly as efficent as it should be. The database should do this for you instead of this
   //  terrible work-a-round. Eventually move to Neo4j. For now this works as a POC
 
   // TODO: This function is terribly inefficent. You need to rework this, Neo4j might be your solution.
   def getAllCoursesInPath(org_id: Int, objectives: List[Int]): Map[Int, DataNode[Task]] = {
-    val courses: Map[Int, Task] =
-      rawData[Task](sql"select * from task where parent_org = ${org_id}").map { task =>
-        (task.task_id, task)
-      }.toMap
+    // TODO: Make all queries in here safer and less SQL heavy
+    val courses = {
+      for {
+        data <- query[Task](sql"select * from task where parent_org = ${org_id}")
+      } yield data.map(task => (task.task_id, task)).toMap
+    }.unsafeRunSync()
 
     // TODO: Using tuples everywhere is terrible design. If you could get your database (neo4j) to do this for you
     //  it would be based.
-    val paths: Map[Int, List[List[Int]]] = (rawData[(Int, Int, Int)](
+    val paths: Map[Int, List[List[Int]]] = (query[(Int, Int, Int)](
       sql"select parent_id, path_id, child_executable_id from path, task, in_path where path.parent_id = task.task_id and task.parent_org = ${org_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
-    ) ++ rawData[(Int, Int, Int)](
+    ).unsafeRunSync() ++ query[(Int, Int, Int)](
       sql"select objective_id, path_id, child_executable_id from path, objective, in_path where path.parent_id = objective.objective_id and objective.parent_org = ${org_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
-    )).foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
+    ).unsafeRunSync())
+      .foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
         p._1.get(data._1) match {
           case None => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
           case Some(_) =>
@@ -90,34 +84,12 @@ case class DBManager(db: Aux[IO, Unit]) {
     })
   }
 
-  def rawData[A: Read](sql: Fragment): List[A] = {
+  // TODO: the .transact() call should be the last thing to happen before a user is returned data. Use a for{} yield
+  //  loop to get access to data before it's processed, then transact, then return.
+  def query[A: Read](sql: Fragment): IO[Seq[A]] = {
     sql
       .query[A]
-      .to[List]
+      .to[Seq]
       .transact(db)
-      // TODO: Figure out how to make this run safely, not a particularly good idea to run it like this.
-      .unsafeRunSync()
-  }
-
-  def query[A: Read](sql: Fragment): IO[Output[Seq[A]]] = {
-    for {
-      res <- sql
-        .query[A]
-        .to[Seq]
-        .transact(db)
-    } yield Ok(res)
-  }
-}
-
-object DatabaseFactory {
-  def newDatabase(): Aux[IO, Unit] = {
-    implicit val cs = IO.contextShift(ExecutionContexts.synchronous)
-    Transactor.fromDriverManager[IO](
-      "org.postgresql.Driver", // driver classname
-      "jdbc:postgresql:university_prereq", // connect URL (driver-specific)
-      "postgres", // user
-      "postgres", // password
-      Blocker.liftExecutionContext(ExecutionContexts.synchronous)
-    )
   }
 }
