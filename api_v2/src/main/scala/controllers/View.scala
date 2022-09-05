@@ -10,16 +10,12 @@ import doobie.implicits._
 import models._
 import shapeless._
 
-case class ViewRoutes(
-  getCourses: Endpoint[IO, Seq[Task]],
-  getOrgs: Endpoint[IO, Seq[Org]],
-  getObjectives: Endpoint[IO, Seq[Objective]]
-)
-
 object View extends Route {
   // TODO: Make this return type generic. I don't want to have to type out this garbage just to add a new route. This
   //  needs to be streamlined, I want to repeat myself less.
-  def buildRoutes(dbManager: DBManager): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
+  def buildRoutes(
+    dbManager: DBManager
+  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, DataNode[Task]] :+: CNil] = {
 
     val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
       dbManager.query[Task](sql"select * from task")
@@ -35,6 +31,16 @@ object View extends Route {
       )
     }
 
-    getCourses :+: getOrgs :+: getObjectives
+    val getTasksByObjective: Endpoint[IO, Map[Int, DataNode[Task]]] = get("tasksByObjective") {
+      Ok(
+        dbManager
+          .getAllCoursesInPath(
+            Org(322548944, Some("e"), Some("E"), Some("e"), Some(0)),
+            List(Objective(1954948891, 0, Some("e"), Some("e")))
+          )
+      )
+    }
+
+    getCourses :+: getOrgs :+: getObjectives :+: getTasksByObjective
   }
 }

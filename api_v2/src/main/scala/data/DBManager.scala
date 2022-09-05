@@ -14,11 +14,11 @@ import scala.collection.mutable
 
 case class DBManager(db: Aux[IO, Unit]) {
 
-  def getOrgs(): IO[Output[List[Org]]] = {
+  def getOrgs(): IO[Output[Seq[Org]]] = {
     query[Org](sql"select * from organization")
   }
 
-  def getObjectives(org: Org): IO[Output[List[Objective]]] = {
+  def getObjectives(org: Org): IO[Output[Seq[Objective]]] = {
     query[Objective](
       sql"select objective_id, parent_org, objective.title, objective.description from objective, organization where objective.parent_org = ${org.organization_id}"
     )
@@ -33,39 +33,71 @@ case class DBManager(db: Aux[IO, Unit]) {
   //  terrible work-a-round. Eventually move to Neo4j. For now this works as a POC
 
   // TODO: This function is terribly inefficent. You need to rework this, Neo4j might be your solution.
-  private def getAllCoursesInPath(org: Org, objectives: List[Objective]): ExecutableTree = {
-    val courses: List[Task] = rawData[Task](sql"select * from task where parent_org = ${org.organization_id}")
+  def getAllCoursesInPath(org: Org, objectives: List[Executable]): Map[Int, DataNode[Task]] = {
+    val courses: Map[Int, Task] =
+      rawData[Task](sql"select * from task where parent_org = ${org.organization_id}").map { task =>
+        (task.task_id, task)
+      }.toMap
 
-    val courseInfo: Map[Int, Task] = courses.map { task =>
-      (task.task_id, task)
-    }.toMap
-
-    // parent_task, path_id, child_task
-    val paths = rawData[(Int, Int, Int)](
+    val pathsRough = (rawData[(Int, Int, Int)](
       sql"select parent_id, path_id, child_executable_id from path, task, in_path where path.parent_id = task.task_id and task.parent_org = ${org.organization_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
+    ) ++ rawData[(Int, Int, Int)](
+      sql"select objective_id, path_id, child_executable_id from path, objective, in_path where path.parent_id = objective.objective_id and objective.parent_org = ${org.organization_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
+    ))
+
+    Console.println(pathsRough)
+    Console.println(
+      s"At ${objectives.head.executable_id} -> ${pathsRough.find((p) => p._1 == objectives.head.executable_id)}"
     )
 
-    // Map[Path_id, List[Task_id]]
-    val listOfPaths: Map[Int, List[Int]] = paths.foldLeft(Map[Int, List[Int]]())((ac, t) => {
-      ac.exists(_ == t._2) match {
-        case false => ac + (t._2 -> List(t._3))
-        case true  => ac + (t._2 -> (t._3 :: ac(t._2)))
+    val paths =
+      pathsRough
+        .foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
+          p._1.exists(_ == data._1) match {
+            case false => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
+            case true =>
+              p._2.contains(data._2) match {
+                case false => (p._1 + (data._1 -> (List[Int](data._3) :: p._1(data._1))), p._2 + data._2)
+                case true  => (p._1 + (data._1 -> ((data._3 :: p._1(data._1).last) :: p._1(data._1).init)), p._2)
+              }
+          }
+        }
+        ._1
+
+    Console.println(paths)
+    Console.println(
+      s"At ${objectives.head.executable_id} -> ${paths(objectives.head.executable_id)}"
+    )
+
+    // TODO: The absolute state of this entire function man ...
+    def buildNodes(
+      // List of (previous task_id (parent task_id), current task_id)
+      queue: List[(Int, Int)],
+      seen: Set[Int] = Set(),
+      res: Map[Int, DataNode[Task]] = Map()
+    ): Map[Int, DataNode[Task]] = {
+      queue match {
+        case init :+ last => {
+          seen.contains(last._2) match {
+            case true =>
+              buildNodes(
+                init,
+                seen,
+                res + (last._2 -> res(last._2).copy(parent_id = last._1 :: res(last._2).parent_id))
+              )
+            case false =>
+              buildNodes(
+                init ++ paths(last._2).flatten.map(exe_id => (last._2, exe_id)),
+                seen + last._2,
+                res + (last._2 -> DataNode[Task](courses(last._2), List(last._1), paths(last._2)))
+              )
+          }
+        }
+        case _ => { res }
       }
-    })
+    }
 
-    val taskMap: Map[Int, List[List[Int]]] = paths.foldLeft(Map[Int, List[List[Int]]]())((ac, t) => {
-      ac.exists(_ == t._1) match {
-        case false => ac + (t._1 -> List(listOfPaths(t._2)))
-        case true  => ac + (t._1 -> (listOfPaths(t._2) :: ac(t._1)))
-      }
-    })
-
-    val head: ExecutableTree =
-      ExecutableTree(Objective(0, org.organization_id, Some("Custom objective"), None), List[ExecutableTree]())
-
-    val res = (parent: ExecutableTree) => {}
-
-    head
+    buildNodes(objectives.map(exe => (0, exe.executable_id)))
   }
 
   def rawData[A: Read](sql: Fragment): List[A] = {
@@ -76,11 +108,11 @@ case class DBManager(db: Aux[IO, Unit]) {
       .unsafeRunSync()
   }
 
-  def query[A: Read](sql: Fragment): IO[Output[List[A]]] = {
+  def query[A: Read](sql: Fragment): IO[Output[Seq[A]]] = {
     for {
       res <- sql
         .query[A]
-        .to[List]
+        .to[Seq]
         .transact(db)
     } yield Ok(res)
   }
