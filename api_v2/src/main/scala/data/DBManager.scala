@@ -18,30 +18,52 @@ case class DBManager(db: Aux[IO, Unit]) {
   // TODO: This function is terribly inefficent. You need to rework this, Neo4j might be your solution.
   def getAllCoursesInPath(org_id: Int, objectives: List[Int]): Map[Int, DataNode[Task]] = {
     // TODO: Make all queries in here safer and less SQL heavy
-    val courses = {
+    val courses = ({
       for {
-        data <- query[Task](sql"select * from task where parent_org = ${org_id}")
+        data <- sql"select * from task where parent_org = ${org_id}"
+          .query[Task]
+          .to[Seq]
       } yield data.map(task => (task.task_id, task)).toMap
-    }.unsafeRunSync()
+    }).transact(db).unsafeRunSync()
 
     // TODO: Using tuples everywhere is terrible design. If you could get your database (neo4j) to do this for you
     //  it would be based.
-    val paths: Map[Int, List[List[Int]]] = (query[(Int, Int, Int)](
-      sql"select parent_id, path_id, child_executable_id from path, task, in_path where path.parent_id = task.task_id and task.parent_org = ${org_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
-    ).unsafeRunSync() ++ query[(Int, Int, Int)](
-      sql"select objective_id, path_id, child_executable_id from path, objective, in_path where path.parent_id = objective.objective_id and objective.parent_org = ${org_id} and in_path.parent_path = path.path_id order by parent_id, path_id"
-    ).unsafeRunSync())
-      .foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
-        p._1.get(data._1) match {
-          case None => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
-          case Some(_) =>
-            p._2.contains(data._2) match {
-              case false => (p._1 + (data._1 -> (List[Int](data._3) :: p._1(data._1))), p._2 + data._2)
-              case true  => (p._1 + (data._1 -> ((data._3 :: p._1(data._1).last) :: p._1(data._1).init)), p._2)
-            }
+    val getPaths =
+      sql"""
+         |SELECT parent_id, path_id, child_executable_id
+         |FROM path, in_path, (
+         |    SELECT (executable_id)
+         |    FROM executable, task 
+         |    WHERE executable.executable_id = task.task_id 
+         |    AND task.parent_org = ${org_id} 
+         |    UNION 
+         |    SELECT (executable_id)
+         |    FROM executable, objective 
+         |    WHERE executable.executable_id = objective.objective_id
+         |    AND objective.parent_org = ${org_id}
+         |) as exe 
+         |WHERE path.parent_id = exe.executable_id
+         |AND in_path.parent_path = path.path_id
+         |ORDER BY parent_id, path_id;
+         |""".stripMargin
+
+    val paths: Map[Int, List[List[Int]]] = (for {
+      raw <- getPaths
+        .query[(Int, Int, Int)]
+        .to[Seq]
+    } yield
+      raw
+        .foldLeft((Map[Int, List[List[Int]]](), Set[Int]())) { (p, data) =>
+          p._1.get(data._1) match {
+            case None => (p._1 + (data._1 -> List[List[Int]](List[Int](data._3))), p._2 + data._2)
+            case Some(_) =>
+              p._2.contains(data._2) match {
+                case false => (p._1 + (data._1 -> (List[Int](data._3) :: p._1(data._1))), p._2 + data._2)
+                case true  => (p._1 + (data._1 -> ((data._3 :: p._1(data._1).last) :: p._1(data._1).init)), p._2)
+              }
+          }
         }
-      }
-      ._1
+        ._1).transact(db).unsafeRunSync()
 
     // TODO: The absolute state of this entire function man ...
     def buildNodes(
