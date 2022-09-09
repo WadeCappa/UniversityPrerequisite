@@ -1,4 +1,4 @@
-### Elixir ###
+# Elixir
 /api/_build
 /api/cover
 /api/deps
@@ -11,7 +11,10 @@
 /api/.elixir_ls/
 **/*.secret.exs
 
-### Scala ###
+# Planning 
+/planning/sql/venv
+
+# Scala 
 /api_v2/lib/*.jar
 /api_v2/test/files/codelib/*.jar
 /api_v2/test/files/lib/*.jar

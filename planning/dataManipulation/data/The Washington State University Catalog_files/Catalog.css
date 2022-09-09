@@ -1,0 +1,177 @@
+div#main p.disclaimer {
+	text-align: initial;
+	font-style: italic;
+}
+
+div#main div#unit-info {
+	float: left;
+	//width: 70%;
+}
+
+div#main div#unit-nav {
+	float: left;
+	width: 30%;
+}
+
+div#main p.H4 {
+	font-weight:bold;
+	padding-bottom:0px;
+	padding-top:10px;
+}
+
+div#main p.B1 {
+    text-align: initial;
+    text-indent: 2em;
+    padding-bottom: 0px;
+}
+
+div#main p.B1A {
+    padding-top: 10px;
+    text-align: initial;
+    padding-bottom: 0px;
+}
+
+div#main p.B1B {
+    text-align: initial;
+    text-indent: 2em;
+    padding-bottom: 0px;
+}
+
+div#main p {
+	margin: 0pt;
+	padding: 0pt;
+}
+
+div#main li {
+	line-height: 1.2em;
+}
+
+div#main {
+	font-size: 10pt;
+}
+
+    div#main p.faculty_list {
+        font-style: italic;
+        text-align: initial;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+/*
+div#main div#unit-info > div.unit_description {
+	margin-top: 20px;
+}
+*/
+
+div.au_selector {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+div#unit-info h3.degree_header {
+	width: 100%;
+	font-size: 1.2375em;
+	margin-top: 20px;
+}
+
+h3.degree_header > span.degree_title {
+	float: left;
+	width: 80%;
+}
+
+h3.degree_header > span.degree_hours {
+	float: right;
+	width: 20%;
+}
+
+h3.degree_header + div.degree_info {
+	margin-top: 50px;	
+}
+
+p.course_ending {
+	color: #999999;
+}
+
+span.course_header {
+	font-weight: bold;
+}
+
+table.degree_sequence_list td.degree_sequence_Year {
+	font-weight: bold;
+	padding-top: 15px;
+}
+
+table.form_table {
+	width: 100%;
+}
+
+tr.degree_sequence_term_header > td {
+	font-style: italic;
+	padding-top: 10px;
+}
+
+p.course + h4 {
+	padding-top: 5px;
+}
+
+td.label {
+	vertical-align: top;
+	width: 25%;
+}
+
+td.command {
+	vertical-align: top; 
+	float: right;
+}
+
+td.input > input[type="text"] {
+	width: 100%;
+}
+
+td.input > select + input[type="text"] {
+	width: 75%;
+}
+
+td.command {
+	vertical-align: top;
+	text-align: right;
+}
+
+td.command > input[type="submit"] {
+	width: 100%;
+}
+
+div.regulation {
+    text-align: initial;
+    margin-left: 20px;
+}
+
+p.error_msg {
+	color: #EE1C1C;
+	background-image: url(http://catalog.wsu.edu/Catalog/Graphics/ErrorMsg.JPG);
+	background-position: left;
+	background-repeat: no-repeat;
+}
+
+#campus_menu .bd {
+	background-color: #FFFFFF;
+	border:solid 1px #808080;
+}
+
+#campus_menu .yuimenuitem {
+	padding: 0px;
+}
+
+#campus_menu .yuimenuitem .yuimenuitemlabel {
+	color: #003768;
+	padding: 0px 2px 0px 2px;
+}
+
+table#Academic_Calendar {
+	width: 100%;
+}
+
+table#Academic_Calendar *.AcadCal_Date {
+	text-align: right;
+	white-space: nowrap;
+}
