@@ -1,0 +1,1 @@
+// before writing any inserts, find an optimal schema (a conversion from your SQL schema)
