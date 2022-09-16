@@ -2,7 +2,7 @@ import random
 
 class Task(): 
     def __init__(self, id: int, subject: str, number: int, points: int, title: str):
-        self.id = id,
+        self.task_id = f"task{id}"
         self.subject = subject 
         self.number = number 
         self.points = points 
@@ -24,6 +24,9 @@ class Inserter():
         f.write(func())
         f.close()
 
+    def randInt(self) -> int:
+        return random.randint(0, 2147483647)
+
 
     def cleanInsert(self, insert):
         return insert + "\n"
@@ -35,7 +38,7 @@ class Inserter():
             for line in f:
                 if line[-1] == '\n': line = line[:-1]
                 line = line.split(',')
-                data.append(Task(random.randint(-2147483648, 2147483647), line[0],int(line[1]),int(line[2]),line[3]))
+                data.append(Task(self.randInt(), line[0], int(line[1]),int(line[2]),line[3]))
 
         return data
         
@@ -50,7 +53,7 @@ class Inserter():
         def createTaskInerts():
             s = ""
             for t in tasks:
-                s += "CREATE (:Executable :Task" + "{" + f"subject: \"{t.subject}\", number: {t.number}, title: \"{t.title}\", weight: {t.points}" + "})\n" 
+                s += f"CREATE ({t.task_id} :Executable :Task" + "{" + f"subject: \"{t.subject}\", number: {t.number}, title: \"{t.title}\", weight: {t.points}" + "})\n" 
             return self.cleanInsert(s)
 
         self.writeToFile(createTaskInerts)
@@ -58,8 +61,9 @@ class Inserter():
 
     def insertOrg(self):
         def createOrgInsert():
-            s = "CREATE (:Organization :Repository {title: \"Washington State University\", slots_per_bucket: 18})\n"
-            return s 
+            s = "CREATE (wsu :Organization :Repository {title: \"Washington State University\", slots_per_bucket: 18})\n"
+            s += "CREATE (ob :Objective :Executable {title: \"B.S in Computer Science\"})-[:HAS]->(ob_path :Path)\n"
+            return self.cleanInsert(s) 
 
         self.writeToFile(createOrgInsert)
 
@@ -75,22 +79,32 @@ class Inserter():
                 paths = data[1].split(' | ')
                 paths = list(map(lambda x: list(map(lambda y: executables[y], x.split(' '))), paths))
 
-                for p in paths:
-                    path += f"MERGE (:Task :Executable " + "{" + f"subject: \"{parent.subject}\", number: {parent.number}" + "}" + ")-[:HAS]->(p :Path)\n"
+                for index, p in enumerate(paths):
+                    p_id = f"path_{index}_of_{parent.task_id}"
+                    path += f"CREATE ({parent.task_id})-[:HAS]->({p_id} :Path)\n"
                     for child in p:
-                        path += f"(p)-[:CONTAINS]->(:Task " + "{" + f"subject: \"{child.subject}\", number: {child.number}" + "}" + ")\n"
+                        path += f"CREATE ({p_id})-[:CONTAINS]->({child.task_id})\n"
 
         self.writeToFile(lambda: self.cleanInsert(path))
 
 
     def buildObjective(self, exe: dict[str, Task]):
         paths = "CPTS-121 CPTS-122 MATH-171 MATH-172 MATH-216 CPTS-302 CPTS-317 CPTS-322 CPTS-350 CPTS-355 CPTS-360 CPTS-421 CPTS-423 CPTS-427"
-        objective = "MERGE (ob :Objective :Executable {})-[:HAS]->(p :Path)\n".format("{title: \"B.S in Computer Science\"}") 
+        objective = ""
 
         for p in list(map(lambda s: exe[s], paths.split(' '))):
-            objective += f"(p)-[:CONTAINS]->(:Task " + "{" + f"subject: \"{p.subject}\", number: {p.number}" + "}" + ")\n"
+            objective += f"CREATE (ob_path)-[:CONTAINS]->({p.task_id})\n"
 
-        self.writeToFile(lambda: objective)
+        self.writeToFile(lambda: self.cleanInsert(objective))
+
+
+    def relateClasses(self, map: dict[str, Task]):
+        s = ""
+        
+        for t in map.values():
+            s+= f"CREATE (wsu)-[:OWNS]->({t.task_id})\n"
+
+        return self.writeToFile(lambda: self.cleanInsert(s))
 
 
 def main():
@@ -102,6 +116,7 @@ def main():
     i.insertTasks(tasks)
     i.buildPrereqs('./data/prereq.csv', stringToTask)
     i.buildObjective(stringToTask)
+    i.relateClasses(stringToTask)
 
 if __name__ == "__main__":
     main()
