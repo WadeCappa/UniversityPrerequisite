@@ -1,24 +1,32 @@
-# The directory Mix will write compiled artifacts to.
-/_build/
+# macOS
+.DS_Store
 
-# If you run "mix test --cover", coverage assets end up here.
-/cover/
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/local-plugins.sbt
+.history
+.ensime
+.ensime_cache/
+.sbt-scripted/
+local.sbt
 
-# The directory Mix downloads your dependencies sources to.
-/deps/
+# Bloop
+.bsp
 
-# Where 3rd-party dependencies like ExDoc output generated docs.
-/doc/
+# VS Code
+.vscode/
 
-# Ignore .fetch files in case you like to edit your project deps locally.
-/.fetch
+# Metals
+.bloop/
+.metals/
+metals.sbt
 
-# If the VM crashes, it generates a dump, let's ignore it too.
-erl_crash.dump
-
-# Also ignore archive artifacts (built via "mix archive.build").
-*.ez
-
-# Ignore package tarball (built via "mix hex.build").
-api-*.tar
-
+# IDEA
+.idea
+.idea_modules
+/.worksheet/

@@ -1,19 +1,11 @@
-# Api
+## sbt project compiled with Scala 3
 
-To start your Phoenix server:
+### Usage
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+This is a normal sbt project. You can compile code with `sbt compile`, run it with `sbt run`, and `sbt console` will start a Scala 3 REPL.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+For more information on the sbt-dotty plugin, see the
+escala3-example-project](https://github.com/scala/scala3-example-project/blob/main/README.md).
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+## API Inputs
+curl -X GET -H "Content-Type: application/json" -d '{"organization_id":322548944}' localhost:8081/objective
