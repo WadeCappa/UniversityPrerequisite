@@ -1,7 +1,8 @@
 import random
 
 class Task(): 
-    def __init__(self, subject, number, points, title):
+    def __init__(self, id: int, subject: str, number: int, points: int, title: str):
+        self.id = id,
         self.subject = subject 
         self.number = number 
         self.points = points 
@@ -11,8 +12,6 @@ class Inserter():
     def __init__(self, outputFile = "inserts.cql"):
         # establish constants        
         self.out = outputFile
-        self.WSU_ORG_ID = 322548944
-        self.CS_OBJ_ID = 1954948891
 
         # clean input file for new inputs
         f = open(self.out, "w")
@@ -27,120 +26,82 @@ class Inserter():
 
 
     def cleanInsert(self, insert):
-        return insert[:-2] + ";\n\n"
+        return insert + "\n"
 
 
-    def getId(self, executables, course):
-        return executables[tuple(course.replace('\n', '').split('-'))]
-
-
-    def buildTasks(self):
+    def buildTasks(self)-> list[Task]:
         data = []
         with open ("./data/course.csv", 'r') as f:
             for line in f:
                 if line[-1] == '\n': line = line[:-1]
                 line = line.split(',')
-                data.append(Task(line[0],int(line[1]),int(line[2]),line[3]))
+                data.append(Task(random.randint(-2147483648, 2147483647), line[0],int(line[1]),int(line[2]),line[3]))
 
         return data
         
 
-    def buildExecutables(self, tasks: list(Task)):
-        exe = {}
+    def buildExecutables(self, tasks: list[Task]) -> dict[str, Task]:
+        exe = dict()
         for task in tasks:
-            exe[(task['subject'], task['number'])] = task["id"]
+            exe[f"{task.subject}-{task.number}"] = task
         return exe
 
-
-    def insertExecutables(self, exe):
-        def createExeInerts():
-            s = "INSERT INTO executable (executable_id) VALUES\n"
-            for _,v in exe.items():
-                s += f"({v}),\n"
-            return self.cleanInsert(s)
-        self.writeToFile(createExeInerts)
-
-
-    def insertTasks(self, tasks):
+    def insertTasks(self, tasks: list[Task]):
         def createTaskInerts():
-            s = "INSERT INTO task (task_id, parent_org, subject, number, slot_weight) VALUES\n"
-            for dict in tasks:
-                s += f"({dict['id']}, {self.WSU_ORG_ID}, '{dict['subject']}', '{dict['number']}', {dict['points']}),\n"
+            s = ""
+            for t in tasks:
+                s += "CREATE (:Executable :Task" + "{" + f"subject: \"{t.subject}\", number: {t.number}, title: \"{t.title}\", weight: {t.points}" + "})\n" 
             return self.cleanInsert(s)
+
         self.writeToFile(createTaskInerts)
 
 
     def insertOrg(self):
         def createOrgInsert():
-            s = "CREATE (:Organization :Repository {})".format("{title: \"Washington State University\", slots_per_bucket: 18}")
+            s = "CREATE (:Organization :Repository {title: \"Washington State University\", slots_per_bucket: 18})\n"
             return s 
 
         self.writeToFile(createOrgInsert)
 
 
-    def insertMission(self):
-        def createMission():
-            s = "CREATE (ob :Objective :Executable {} return ob)".format("{title: \"B.S in Computer Science\"}")
-            return s 
-
-        def enterMissionIntoExecutable():
-            s = "INSERT INTO executable (executable_id) VALUES \n"
-            s += F"({self.CS_OBJ_ID});\n\n"
-            return s 
-
-        self.writeToFile(enterMissionIntoExecutable)
-        self.writeToFile(createMission)
-
-
-    def buildPrereqs(self, file, executables):
-        getId = self.getId
-
-        path = "INSERT INTO path (path_id, parent_id) VALUES\n"
-        inPath = "INSERT INTO in_path (parent_path, child_executable_id) VALUES\n"
+    def buildPrereqs(self, file, executables: dict[str, Task]):
+        path = ""
 
         with open (file, "r") as f:
             for line in f:
+                line = line.replace('\n', '')
                 data = line.split(',')
-                parent = getId(executables, data[0])
+                parent = executables[data[0]]
                 paths = data[1].split(' | ')
-                paths = map(lambda x: map(lambda y: getId(executables, y), x.split(' ')), paths)
+                paths = list(map(lambda x: list(map(lambda y: executables[y], x.split(' '))), paths))
 
                 for p in paths:
-                    path_id = random.randint(-2147483648, 2147483647)
-                    path += f"({path_id}, {parent}),\n"
-                    for c_id in p:
-                        inPath += f"({path_id}, {c_id}),\n"
+                    path += f"MERGE (:Task :Executable " + "{" + f"subject: \"{parent.subject}\", number: {parent.number}" + "}" + ")-[:HAS]->(p :Path)\n"
+                    for child in p:
+                        path += f"(p)-[:CONTAINS]->(:Task " + "{" + f"subject: \"{child.subject}\", number: {child.number}" + "}" + ")\n"
 
-        path = self.cleanInsert(path)
-        inPath = self.cleanInsert(inPath)
-        self.writeToFile(lambda: path)
-        self.writeToFile(lambda: inPath)
+        self.writeToFile(lambda: self.cleanInsert(path))
 
 
-    def buildObjective(self, exe):
+    def buildObjective(self, exe: dict[str, Task]):
         paths = "CPTS-121 CPTS-122 MATH-171 MATH-172 MATH-216 CPTS-302 CPTS-317 CPTS-322 CPTS-350 CPTS-355 CPTS-360 CPTS-421 CPTS-423 CPTS-427"
-        
-        path_id = random.randint(-2147483648, 2147483647)
-        pathinsert = f"INSERT INTO path (path_id, parent_id) VALUES\n({path_id}, {self.CS_OBJ_ID});\n\n"
-        inPathInsert = "INSERT INTO in_path (parent_path, child_executable_id) VALUES\n"
+        objective = "MERGE (ob :Objective :Executable {})-[:HAS]->(p :Path)\n".format("{title: \"B.S in Computer Science\"}") 
 
-        for p in paths.split(' '):
-            inPathInsert += f"({path_id}, {self.getId(exe, p)}),\n"
+        for p in list(map(lambda s: exe[s], paths.split(' '))):
+            objective += f"(p)-[:CONTAINS]->(:Task " + "{" + f"subject: \"{p.subject}\", number: {p.number}" + "}" + ")\n"
 
-        inPathInsert = self.cleanInsert(inPathInsert)
-        self.writeToFile(lambda: pathinsert)
-        self.writeToFile(lambda: inPathInsert)
+        self.writeToFile(lambda: objective)
 
 
 def main():
-    i = Inserter("testingData.sql")
+    i = Inserter("inserts.cql")
 
     tasks = i.buildTasks()
+    stringToTask = i.buildExecutables(tasks)
     i.insertOrg()
     i.insertTasks(tasks)
-    i.insertMission()
-    i.buildPrereqs('./prereq.csv', executables)
-    i.buildObjective(executables)
+    i.buildPrereqs('./data/prereq.csv', stringToTask)
+    i.buildObjective(stringToTask)
 
 if __name__ == "__main__":
     main()
