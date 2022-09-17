@@ -1,4 +1,4 @@
-val scala3Version = "2.13.0"
+val scala3Version = "2.13.8"
 
 lazy val root = project
   .in(file("."))
@@ -6,10 +6,8 @@ lazy val root = project
     name := "api",
     version := "0.1.0-SNAPSHOT",
     scalaVersion := scala3Version,
-    scalacOptions += "-Ypartial-unification",
-    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
+    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29",
     libraryDependencies ++= Seq(
-      // NOTE: using finchx instead of finch allows us to use polymorphic Endpoint[F[_], T]
       "io.circe" %% "circe-generic" % "0.13.0",
       "io.circe" %% "circe-core" % "0.13.0",
       "com.github.finagle" %% "finchx-core" % "0.33.0",

@@ -9,6 +9,7 @@ import doobie.util.fragment.Fragment
 import doobie.util.Read
 import doobie.util.transactor.Transactor.Aux
 import models._
+import neo4s.implicits._
 import shapeless._
 
 object ViewFactory extends Route {
@@ -25,10 +26,10 @@ object ViewFactory extends Route {
   //  needs to be streamlined, I want to repeat myself less.
   def getRoutes(
     dbManager: DBManager
-  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, DataNode[Task]] :+: CNil] = {
+  ): Endpoint[IO, Seq[(String, Int)] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, DataNode[Task]] :+: CNil] = {
 
-    val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
-      buildEndpoint[Task](dbManager.db, sql"select * from task")
+    val getCourses: Endpoint[IO, Seq[(String, Int)]] = get("courses") {
+      dbManager.buildEndpoint[(String, Int)](cypher"match (p :Task) return p.subject, p.number")
     }
 
     val getOrgs: Endpoint[IO, Seq[Org]] = get("orgs") {
