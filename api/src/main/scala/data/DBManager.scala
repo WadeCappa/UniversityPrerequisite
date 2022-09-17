@@ -6,6 +6,13 @@ import doobie.util.transactor.Transactor
 import doobie.util.transactor.Transactor.Aux
 import doobie.util.fragment.Fragment
 import doobie.util.Read
+
+import cats.effect.{Blocker, ExitCode, IO, IOApp, Resource}
+import doobie.util.ExecutionContexts
+import doobie.util.transactor.Transactor
+import doobie.util.transactor.Transactor.Aux
+import neo4s._
+
 import doobie.ConnectionIO
 import doobie.implicits._
 import models._
@@ -114,4 +121,16 @@ case class DBManager(db: Aux[IO, Unit]) {
       .to[Seq]
       .transact(db)
   }
+
+  def queryDB(cypher: String) = {
+
+    object DatabaseFactory {
+      def newDatabase(): Resource[IO, Neo4jTransactor[IO]] = {
+        val NEO4J_URI = "bolt://localhost:7687/db/neo4j"
+        Neo4jTransactor.create[IO](NEO4J_URI)
+      }
+    }
+
+  }
+
 }
