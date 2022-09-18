@@ -14,39 +14,28 @@ import shapeless._
 
 object ViewFactory extends Route {
 
-  private def buildEndpoint[T: Read](db: Aux[IO, Unit], sql: Fragment): IO[Output[Seq[T]]] = {
-    sql
-      .query[T]
-      .to[Seq]
-      .map(row => Ok(row))
-      .transact(db)
-  }
-
   // TODO: Make this return type generic. I don't want to have to type out this garbage just to add a new route. This
   //  needs to be streamlined, I want to repeat myself less.
   def getRoutes(
     dbManager: DBManager
-  ): Endpoint[IO, Seq[(String, Int)] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, DataNode[Task]] :+: CNil] = {
+  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
 
-    val getCourses: Endpoint[IO, Seq[(String, Int)]] = get("courses") {
-      dbManager.buildEndpoint[(String, Int)](cypher"match (p :Task) return p.subject, p.number")
+    val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
+      dbManager.buildEndpoint[Task](cypher"match (p :Task) return p.subject, p.number, p.slot_weight, p.title")
     }
 
     val getOrgs: Endpoint[IO, Seq[Org]] = get("orgs") {
-      buildEndpoint[Org](dbManager.db, sql"select * from organization")
+      dbManager.buildEndpoint[Org](cypher"match (o: Organization) return o.title, o.slots_per_bucket")
     }
 
-    val getObjectives: Endpoint[IO, Seq[Objective]] = get("objective" :: path[Int]) { org_id: Int =>
-      val sql =
-        sql"select objective_id, parent_org, objective.title, objective.description from objective, organization where objective.parent_org = ${org_id}"
-      buildEndpoint[Objective](dbManager.db, sql)
+    val getObjectives: Endpoint[IO, Seq[Objective]] = get("objective" :: path[String]) { org_title: String =>
+      dbManager.buildEndpoint[Objective](
+        cypher"match (:Organization {title:$org_title})-[]->(r:Objective) return r.title"
+      )
     }
 
-    val getTasks: Endpoint[IO, Map[Int, DataNode[Task]]] = get("tasks" :: path[Int] :: path[String]) {
-      (org_id: Int, objectives: String) =>
-        Ok(dbManager.getAllCoursesInPath(org_id, objectives.split('-').map(_.toInt).toList))
-    }
+    // TODO: Need one more route that gives the front-end a mapping between tasks and their parents and children.
 
-    getCourses :+: getOrgs :+: getObjectives :+: getTasks
+    getCourses :+: getOrgs :+: getObjectives
   }
 }
