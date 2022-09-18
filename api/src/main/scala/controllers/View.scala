@@ -34,7 +34,11 @@ object ViewFactory extends Route {
       )
     }
 
-    // TODO: Need one more route that gives the front-end a mapping between tasks and their parents and children.
+    // TODO: Use the cypher query below to build a mapping between each Task's parents and their children.
+    //  The data of the task should only be sent once, the child and parent mappings should be by keys only.
+    // match (:Executable {title:"B.S in Computer Science"})-[*..]->(t: Task)
+    // match (t)-[h:HAS]->(p:Path)-[con:CONTAINS]->(c:Task) return distinct t.subject, t.number,ID(p), c.subject, c.number
+    // order by ID(p)
 
     getCourses :+: getOrgs :+: getObjectives
   }
