@@ -12,25 +12,13 @@ import org.neo4j.driver.{Config, Logging}
 
 case class DBManager(db: Aux[IO, Unit]) {
 
-  def objectiveTasks(objectives: Seq[String]): IO[Output[Map[Int, DataNode[Task]]]] = {
-    val cypher = cypher"""
-      match (:Executable {title:"B.S in Computer Science"})-[*..]->(t: Task)
-      match (t)-[h:HAS]->(p:Path)-[con:CONTAINS]->(c:Task) return distinct ID(t), t.subject, t.number, t.title, t.weight,ID(p), ID(c)
-      order by ID(p)"""
-
-    val data = (for {
-      res <- cypher
-        .query[(Int, String, Int, String, Int, Int, Int)]
-        .list
-        .map(
-          _.map(tup => tup._1 -> (Task(tup._1, tup._2, tup._3, Some(tup._5), Some(tup._4), None), tup._6, tup._7)).toMap
-        )
-    } yield res).transact(transactor)
-
-    val parentsToChildren: Map[Int, List[List[Int]]] =
+  def buildQuery[A: Read](
+    cypher: CypherQuery
+  ): IO[Output[Seq[A]]] = {
+    buildEndpoint[Seq[A]](dataAsSeq[A], cypher)
   }
 
-  private def getData[A: Read](transactor: Neo4jTransactor[IO], cypher: CypherQuery): IO[Seq[A]] = {
+  private def dataAsSeq[A: Read](transactor: Neo4jTransactor[IO], cypher: CypherQuery): IO[Seq[A]] = {
 
     val query = for {
       result <- cypher.query[A].list.map(_.toSeq)
@@ -40,24 +28,20 @@ case class DBManager(db: Aux[IO, Unit]) {
       .transact(transactor)
   }
 
-  def buildQuery[A: Read](cypher: CypherQuery): IO[Output[Seq[A]]] = {
-    buildEndpoint[A](getData[A], cypher)
-  }
-
-  private def buildEndpoint[A: Read](
-    func: (Neo4jTransactor[IO], CypherQuery) => IO[Seq[A]],
+  private def buildEndpoint[A](
+    func: (Neo4jTransactor[IO], CypherQuery) => IO[A],
     cypher: CypherQuery
-  ): IO[Output[Seq[A]]] = {
+  ): IO[Output[A]] = {
 
     useTransactor[A](func, cypher).map(row => {
       Ok(row)
     })
   }
 
-  private def useTransactor[A: Read](
-    func: (Neo4jTransactor[IO], CypherQuery) => IO[Seq[A]],
+  private def useTransactor[A](
+    func: (Neo4jTransactor[IO], CypherQuery) => IO[A],
     cypher: CypherQuery
-  ): IO[Seq[A]] = {
+  ): IO[A] = {
 
     // TODO: Move this to an environment variable
     val NEO4J_URI = "bolt://localhost:7687/db/neo4j"

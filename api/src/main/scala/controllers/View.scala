@@ -4,10 +4,7 @@ import apiData.DBManager
 import cats.effect.IO
 import io.finch._
 import io.finch.catsEffect._
-import doobie.implicits._
-import doobie.util.fragment.Fragment
-import doobie.util.Read
-import doobie.util.transactor.Transactor.Aux
+import neo4s.core.{CypherQuery, Neo4jTransactor}
 import models._
 import neo4s.implicits._
 import shapeless._
@@ -18,10 +15,10 @@ object ViewFactory extends Route {
   //  needs to be streamlined, I want to repeat myself less.
   def getRoutes(
     dbManager: DBManager
-  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
+  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, (Task, List[Int], List[List[Int]])] :+: CNil] = {
 
     val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
-      dbManager.buildQuery[Task](cypher"match (p :Task) return ID(p), p.subject, p.number, p.slot_weight, p.title")
+      dbManager.buildQuery[Task](cypher"match (p :Task) return ID(p), p.subject, p.number, p.weight, p.title")
     }
 
     val getOrgs: Endpoint[IO, Seq[Org]] = get("orgs") {
@@ -34,15 +31,32 @@ object ViewFactory extends Route {
       )
     }
 
-    // TODO: Use the cypher query below to build a mapping between each Task's parents and their children.
-    //  The data of the task should only be sent once, the child and parent mappings should be by keys only.
-    val getCourseMapping: Endpoint[IO, Seq[Task]] = get("tasks-for" :: path[String]) { objective: String =>
-      dbManager.buildQuery[Task](cypher"""
-        match (:Executable {title:"B.S in Computer Science"})-[*..]->(t: Task)
-        match (t)-[h:HAS]->(p:Path)-[con:CONTAINS]->(c:Task) return distinct ID(t), t.subject, t.number, t.title, t.weight,ID(p), ID(c)
-        order by ID(p)""")
-    }
+    val getCourseMapping: Endpoint[IO, Map[Int, DataNode[Task]]] =
+      get("tasks-for" :: path[String]) { objective: String =>
+        dbManager
+          .buildQuery[(Int, String, Int, Option[Int], Option[String], Option[String], List[Int], List[List[Int]])](
+            cypher"""
+          MATCH (:Executable {title:"B.S in Computer Science"})-[*..]->(task: Task)
+          WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
+          RETURN distinct ID(task), task.subject, task.number, task.weight, task.title, task.description, parents, children
+          ORDER BY ID(task)"""
+          )
+          .map(
+            _.map(
+              _.map(
+                row =>
+                  row._1 -> (
+                    DataNode(
+                      Task(row._1, row._2, row._3, row._4, row._5, row._6),
+                      row._7,
+                      row._8
+                    )
+                )
+              ).toMap
+            )
+          )
+      }
 
-    getCourses :+: getOrgs :+: getObjectives
+    getCourses :+: getOrgs :+: getObjectives :+: getCourseMapping
   }
 }

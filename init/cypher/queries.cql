@@ -16,6 +16,7 @@ RETURN n, parents, children
 
 
 // relates each node with parents and siblings.
-MATCH (:Executable {title:"B.S in Computer Science"})-[*..]->(n: Task)
-WITH n, [(n)<-[]-()<-[]-(x:Task) | ID(x)] as parents,  [(x:Task)<-[]-()<-[]-(n) | ID(x)] as children
-RETURN ID(n), n.subject, n.number, n.title,n.weight, parents, children
+MATCH (:Executable {title:"B.S in Computer Science"})-[*..]->(task: Task)
+WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
+RETURN distinct ID(task), task.subject, task.number, parents, children
+ORDER BY ID(task)
