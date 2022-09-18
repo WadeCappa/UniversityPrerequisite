@@ -21,24 +21,27 @@ object ViewFactory extends Route {
   ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: CNil] = {
 
     val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
-      dbManager.buildEndpoint[Task](cypher"match (p :Task) return p.subject, p.number, p.slot_weight, p.title")
+      dbManager.buildQuery[Task](cypher"match (p :Task) return ID(p), p.subject, p.number, p.slot_weight, p.title")
     }
 
     val getOrgs: Endpoint[IO, Seq[Org]] = get("orgs") {
-      dbManager.buildEndpoint[Org](cypher"match (o: Organization) return o.title, o.slots_per_bucket")
+      dbManager.buildQuery[Org](cypher"match (o: Organization) return ID(o), o.title, o.slots_per_bucket")
     }
 
     val getObjectives: Endpoint[IO, Seq[Objective]] = get("objective" :: path[String]) { org_title: String =>
-      dbManager.buildEndpoint[Objective](
-        cypher"match (:Organization {title:$org_title})-[]->(r:Objective) return r.title"
+      dbManager.buildQuery[Objective](
+        cypher"match (:Organization {title:$org_title})-[]->(r:Objective) return ID(r), r.title"
       )
     }
 
     // TODO: Use the cypher query below to build a mapping between each Task's parents and their children.
     //  The data of the task should only be sent once, the child and parent mappings should be by keys only.
-    // match (:Executable {title:"B.S in Computer Science"})-[*..]->(t: Task)
-    // match (t)-[h:HAS]->(p:Path)-[con:CONTAINS]->(c:Task) return distinct t.subject, t.number,ID(p), c.subject, c.number
-    // order by ID(p)
+    val getCourseMapping: Endpoint[IO, Seq[Task]] = get("tasks-for" :: path[String]) { objective: String =>
+      dbManager.buildQuery[Task](cypher"""
+        match (:Executable {title:"B.S in Computer Science"})-[*..]->(t: Task)
+        match (t)-[h:HAS]->(p:Path)-[con:CONTAINS]->(c:Task) return distinct ID(t), t.subject, t.number, t.title, t.weight,ID(p), ID(c)
+        order by ID(p)""")
+    }
 
     getCourses :+: getOrgs :+: getObjectives
   }
