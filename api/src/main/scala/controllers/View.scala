@@ -15,7 +15,7 @@ object ViewFactory extends Route {
   //  needs to be streamlined, I want to repeat myself less.
   def getRoutes(
     dbManager: DBManager
-  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, (Task, List[Int], List[List[Int]])] :+: CNil] = {
+  ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, DataNode[Task]] :+: CNil] = {
 
     val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
       dbManager.buildQuery[Task](cypher"match (p :Task) return ID(p), p.subject, p.number, p.weight, p.title")
