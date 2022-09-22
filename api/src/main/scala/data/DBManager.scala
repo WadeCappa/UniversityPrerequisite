@@ -7,7 +7,6 @@ import neo4s.core.Neo4jTransactor
 import neo4s.utils.Read
 import io.finch._
 import neo4s.core.CypherQuery
-import models.{DataNode, Task}
 import org.neo4j.driver.{Config, Logging}
 
 case class DBManager(db: Aux[IO, Unit]) {

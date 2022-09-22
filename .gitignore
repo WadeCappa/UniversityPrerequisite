@@ -71,3 +71,20 @@ api_v2/project/**/metals.sbt
 /api_v2/.attach_pid1355
 
 api_v2/.bsp
+
+# react
+./frontend/.DS_*
+./frontend/*.log
+./frontend/logs
+./frontend/**/*.backup.*
+./frontend/**/*.back.*
+
+./frontend/node_modules
+./frontend/bower_components
+
+./frontend/*.sublime*
+
+./frontend/psd
+./frontend/thumb
+./frontend/sketch
+
