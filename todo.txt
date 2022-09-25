@@ -1,7 +1,7 @@
 1) Rebuild backend with Scala
-	1) Connect PostgreSQL database -> done
-	2) Build data-fetching (and cleaning) singleton -> done
-	3) Build routes to send data in JSON -> done
+	1) Connect PostgreSQL database
+	2) Build data-fetching (and cleaning) singleton
+	3) Build routes to send data in JSON
 	4) Build data-receiving and processing singleton
 		1) New/updated Schedule
 			1) Check to see if input schedule has cycle
@@ -11,7 +11,22 @@
 	5) Eventually transition over to NEO4J instead of PostgreSQL  
 2) Make scripts to auto populate the database. Use the models you declared in the backend. 
 	1) The scripts should be able to be launched from sbt with a special keyword
-	
-3) Add scala tests, this is great practice for industry
 
+3) Frontend 
+	1) User authentication
+		1) Users can sign in with google
+			1) find most secure authentication method
+		2) backend supports this
+	2) Users can create schedules
+		1) auto validation happens in the frontend as you work
+			1) courses that don't have all their prereqs are highlighted in red
+			2) the majors of interest are highlighted in red if not all requirements met
+			3) Users can search for classes and add them to their list
+	3) Users can save schedules	
+		1) on save the backend validates their schedule, sent back error or comfirmation.
+		2) users can still save invalid schedules, but they will be marked as such
+	4) users can load their schedules
+	5) people can view schedules by major, college
+	6) people can be on the site and look at colleges, courses
+	
 sudo -u postgres psql	
