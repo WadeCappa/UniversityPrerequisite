@@ -1,0 +1,37 @@
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
+}
+
+.left {
+  flex: 70%;
+}
+
+.right {
+  flex: 30%;
+  border: solid;
+  margin: 10px;
+  padding: 5px;
+}
+
+.task {
+  border: solid;
+  margin: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.semester {
+  border: solid;
+  margin: 10px;
+  padding: 20px;
+}
+
+.slot {
+  padding: 5px;
+  margin:10px;
+  border: solid;
+}
