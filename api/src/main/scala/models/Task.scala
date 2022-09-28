@@ -1,10 +1,10 @@
 package models
 
 case class Task(
-  task_id: Int,
+  taskID: Int,
   subject: String,
   number: Int,
-  slot_weight: Option[Int],
+  slotWeight: Option[Int],
   title: Option[String],
   description: Option[String]
 )
