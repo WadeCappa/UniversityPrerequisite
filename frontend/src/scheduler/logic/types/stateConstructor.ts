@@ -9,6 +9,6 @@ export type TaskTable = {
     [id: number]: Task;
 }
 
-export const makeState = (taskTable: TaskTable, keyLists: number[][]): MakerState => {
+export function makeState (taskTable: TaskTable, keyLists: number[][]): MakerState {
     return {taskTable, keyLists}
 }

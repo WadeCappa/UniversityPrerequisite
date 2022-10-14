@@ -1,5 +1,5 @@
-import { onDragStart } from '../utility/dragAndDrop'
-import { TaskData } from '../types/task'
+import { onDragStart } from '../logic/utility/dragAndDrop'
+import { TaskData } from '../logic/types/task'
 import React from 'react';
 
 type Props = {

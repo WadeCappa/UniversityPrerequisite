@@ -1,6 +1,6 @@
-import { onDragOver, onDrop } from '../utility/dragAndDrop'
-import { displayCourses } from '../utility/displayTasks';
-import { MakerState } from '../types/stateConstructor';
+import { onDragOver, onDrop } from '../logic/utility/dragAndDrop'
+import { displayCourses } from '../logic/utility/displayTasks';
+import { MakerState } from '../logic/types/stateConstructor';
 import React from 'react';
 
 type Props = {

@@ -1,5 +1,5 @@
 import React from "react";
-import Task from "./../components/task";
+import Task from "../../view/task";
 import { TaskTable } from "../types/stateConstructor";
 
 export const displayCourses = (IDs: number[], table: TaskTable, originID: number) => {

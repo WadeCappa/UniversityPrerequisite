@@ -1,5 +1,5 @@
 import './App.css';
-import ScheduleMaker from './scheduler/scheduleMaker';
+import ScheduleMaker from './scheduler/view/scheduleMaker';
 import React from 'react';
 
 
