@@ -1,6 +1,7 @@
 import { makeState } from '../logic/types/stateConstructor';
 import { MakerState } from '../logic/types/stateConstructor';
 import { dragOver, dragStart, drop } from './utility/dragAndDrop';
+import { TaskData } from './types/task';
 
 import { TaskTable } from './types/stateConstructor';
 
@@ -43,11 +44,19 @@ function onDrop(event: any, newLocation: number, engine: Engine) {
   drop(event, newLocation, engine);
 }
 
+function tasksToTaskData(engine: Engine, originID: number): TaskData[] {
+  return engine.state.keyLists[originID].map(id => engine.state.taskTable[id].taskData).sort((a, b) => {
+    return (a.subject == b.subject) ? Number(a.number < b.number) : Number(a.subject > b.subject);
+  })
+}
+
+
 export {
   initializeState,
   notifyListeners,
   initializeData,
   onDragStart,
   onDrop,
-  onDragOver
+  onDragOver,
+  tasksToTaskData
 }

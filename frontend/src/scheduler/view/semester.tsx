@@ -1,8 +1,9 @@
 
-import { displayCourses } from '../logic/utility/displayTasks';
 import { MakerState } from '../logic/types/stateConstructor';
-import { Engine, onDragOver, onDrop, notifyListeners } from '../logic/engine';
-import React, { Dispatch, SetStateAction } from 'react';
+import { Engine, onDragOver, onDrop } from '../logic/engine';
+import React from 'react';
+
+import { displayCourses } from "./displayCourses"
 
 type Props = {
   index: number;
@@ -18,11 +19,7 @@ function Semester({index, engine}: Props) {
                 courses:
           </div>
           <div>
-                {
-                  // This is highly coupled. The logic should not know what the interface is. Build a function here that 
-                  // takes the cleaned data (the logic cleasns the data) and then displays it as a list of Tasks.
-                }
-                {displayCourses(engine.state.keyLists[index], engine.state.taskTable, index)}
+            {displayCourses(engine, index)}
           </div>
         </div>
       </div>
