@@ -1,7 +1,6 @@
 import { TaskData } from '../logic/types/task'
 import React from 'react';
-import { Engine } from "../logic/engine"
-import {onDragStart} from "../logic/utility/dragAndDrop"
+import { onDragStart } from "../logic/engine"
 
 type Props = {
   task: TaskData;

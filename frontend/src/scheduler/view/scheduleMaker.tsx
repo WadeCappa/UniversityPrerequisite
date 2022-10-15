@@ -4,17 +4,14 @@ import { useEffect, useState } from 'react';
 import Semester from './semester';
 import { displayCourses } from '../logic/utility/displayTasks';
 import Header from './header';
-import { onDragOver, onDrop } from '../logic/utility/dragAndDrop';
 
 // model
-import { Engine } from '../logic/engine';
+import { Engine, initializeState, initializeData, onDrop, onDragOver } from '../logic/engine';
 
 function ScheduleMaker() {
-  const logicEngine: Engine = new Engine();
-  const [makerState, setMakerState] = useState(logicEngine.state);
-  logicEngine.listeners.push((newState) => setMakerState(newState));
+  const [makerState, setMakerState] = useState(initializeState((newState) => setMakerState(newState)));
 
-  useEffect(() => {logicEngine.initializeData()}, []);  
+  useEffect(() => {initializeData(makerState)}, []);  
 
   return (
     <div>      
@@ -22,10 +19,10 @@ function ScheduleMaker() {
       <div className="row">
 
         <div className="column">
-          {makerState.keyLists.slice(1).map((_,i) => {return <Semester index={makerState.keyLists.length - (i + 1)} state={makerState} setState={setMakerState} />})}
+          {makerState.state.keyLists.slice(1).map((_,i) => {return <Semester index={makerState.state.keyLists.length - (i + 1)} engine={makerState} />})}
         </div>
-        <div className="column" onDragOver={onDragOver} onDrop={(event) => setMakerState(onDrop(event, 0, makerState))}>
-          {displayCourses(makerState.keyLists[0], makerState.taskTable, 0)}
+        <div className="column" onDragOver={onDragOver} onDrop={(event) => onDrop(event, 0, makerState)}>
+          {displayCourses(makerState.state.keyLists[0], makerState.state.taskTable, 0)}
         </div>
       </div> 
 
