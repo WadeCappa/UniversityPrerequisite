@@ -50,6 +50,32 @@ function tasksToTaskData(engine: Engine, originID: number): TaskData[] {
   })
 }
 
+function addSemester(engine: Engine) {
+  notifyListeners({
+    state: makeState(
+      engine.state.taskTable, 
+      engine.state.keyLists.concat([[]])
+    ),
+    listeners: engine.listeners
+  })
+}
+
+function removeSemester(engine: Engine) {
+  notifyListeners({
+    state: makeState(
+      engine.state.taskTable, 
+      engine.state.keyLists.map((list, index) => {
+        if (index == 0) {
+          return list.concat(engine.state.keyLists[engine.state.keyLists.length - 1])
+        } 
+        else {
+          return list
+        }}).slice(0, -1)
+    ),
+    listeners: engine.listeners
+  })
+}
+
 
 export {
   initializeState,
@@ -58,5 +84,7 @@ export {
   onDragStart,
   onDrop,
   onDragOver,
-  tasksToTaskData
+  tasksToTaskData,
+  addSemester,
+  removeSemester
 }
