@@ -16,8 +16,10 @@ object ViewFactory extends Route {
     dbManager: DBManager
   ): Endpoint[IO, Seq[Task] :+: Seq[Org] :+: Seq[Objective] :+: Map[Int, DataNode[Task]] :+: CNil] = {
 
-    val getCourses: Endpoint[IO, Seq[Task]] = get("courses") {
-      dbManager.buildQuery[Task](cypher"match (p :Task) return ID(p), p.subject, p.number, p.weight, p.title")
+    val getOrgCourses: Endpoint[IO, Seq[Task]] = get("courses" :: path[String]) { org: String =>
+      dbManager.buildQuery[Task](
+        cypher"match (:Organization {title:$org})-[]->(t:Task) return ID(t), t.subject, t.number, t.weight, t.title"
+      )
     }
 
     val getOrgs: Endpoint[IO, Seq[Org]] = get("orgs") {
@@ -50,6 +52,6 @@ object ViewFactory extends Route {
           )
       }
 
-    getCourses :+: getOrgs :+: getObjectives :+: getCourseMapping
+    getOrgCourses :+: getOrgs :+: getObjectives :+: getCourseMapping
   }
 }
