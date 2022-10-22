@@ -1,6 +1,6 @@
-import { TaskData } from '../logic/types/task'
+import { TaskData } from '../../controllers/scheduler/types/task';
 import React from 'react';
-import { onDragStart } from "../logic/engine"
+import { onDragStart } from '../../controllers/scheduler/engine';
 
 type Props = {
   task: TaskData;

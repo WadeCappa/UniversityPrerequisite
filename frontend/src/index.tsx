@@ -6,17 +6,13 @@ import {
   Route,
   Link,
 } from "react-router-dom";
-import ScheduleMaker from "./scheduler/view/scheduleMaker";
+import Orgs from "./views/orgs";
+import ScheduleMaker from "./views/schedule_maker/scheduleMaker";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <div>
-        <h1>Orgs page</h1>
-        <Link to="scheduler">About Us</Link>
-      </div>
-    ),
+    element: <Orgs/>,
   },
   {
     path: "scheduler",

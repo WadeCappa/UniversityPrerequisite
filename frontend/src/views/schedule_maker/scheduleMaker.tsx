@@ -6,7 +6,7 @@ import Header from './header';
 import { displayCourses } from './displayCourses';
 
 // model
-import { initializeState, initializeData, onDrop, onDragOver, addSemester, removeSemester } from '../logic/engine';
+import { initializeState, initializeData, onDrop, onDragOver, addSemester, removeSemester } from '../../controllers/scheduler/engine';
 
 function ScheduleMaker() {
   const [makerState, setMakerState] = useState(initializeState((newState) => setMakerState(newState)));

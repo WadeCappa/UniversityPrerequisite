@@ -1,5 +1,4 @@
 import { makeState } from "../types/stateConstructor";
-import { MakerState } from "../types/stateConstructor";
 import { Engine, notifyListeners } from "../engine";
 
 export const dragStart = (event: any, originIndex: number) => {

@@ -1,6 +1,5 @@
 
-import { MakerState } from '../logic/types/stateConstructor';
-import { Engine, onDragOver, onDrop } from '../logic/engine';
+import { Engine, onDragOver, onDrop } from '../../controllers/scheduler/engine';
 import React from 'react';
 
 import { displayCourses } from "./displayCourses"

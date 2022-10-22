@@ -1,5 +1,5 @@
-import { makeState } from '../logic/types/stateConstructor';
-import { MakerState } from '../logic/types/stateConstructor';
+import { makeState } from './types/stateConstructor';
+import { MakerState } from './types/stateConstructor';
 import { dragOver, dragStart, drop } from './utility/dragAndDrop';
 import { TaskData } from './types/task';
 
