@@ -1,6 +1,6 @@
 import { TaskData } from '../../controllers/scheduler/types/task';
 import React from 'react';
-import { onDragStart } from '../../controllers/scheduler/engine';
+import Scheduler from '../../controllers/scheduler/Scheduler';
 
 type Props = {
   task: TaskData;
@@ -9,7 +9,7 @@ type Props = {
 
 function Task({task, origin}: Props) {
     return (
-      <div className="task" draggable="true" onDragStart={(event) => onDragStart(event, origin)} key={`${task.subject} ${task.number}`} id={String(task.taskID)}>
+      <div className="task" draggable="true" onDragStart={(event) => Scheduler.onDragStart(event, origin)} key={`${task.subject} ${task.number}`} id={String(task.taskID)}>
             {task.subject} {task.number} {"->"} {task.title}
       </div>
     )

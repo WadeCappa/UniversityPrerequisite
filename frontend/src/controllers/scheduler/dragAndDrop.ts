@@ -1,5 +1,6 @@
-import { makeState } from "../types/stateConstructor";
-import { Engine, notifyListeners } from "../engine";
+import { makeState } from "./types/stateConstructor";
+import Scheduler from "./Scheduler";
+import { SchedulerState } from "./types/SchedulerState";
 
 export const dragStart = (event: any, originIndex: number) => {
     event
@@ -11,14 +12,14 @@ export const dragOver = (event: any) => {
     event.preventDefault();
 }
 
-export const drop = (event: any, newLocation: number, engine: Engine): void => {
+export const drop = (event: any, newLocation: number, state: SchedulerState): void => {
     event.preventDefault();
     
     const transferData = JSON.parse(event.dataTransfer.getData('text'));
 
     const newState = makeState(
-        engine.state.taskTable,
-        engine.state.keyLists.map((l, i) => {
+        state.state.taskTable,
+        state.state.keyLists.map((l, i) => {
             if (newLocation === transferData.originIndex) {return l}
             if (i === newLocation) {return l.concat(transferData.targetID)}
             if (i === transferData.originIndex) {
@@ -28,7 +29,7 @@ export const drop = (event: any, newLocation: number, engine: Engine): void => {
         })
     )
 
-    notifyListeners({state: newState, listeners: engine.listeners})
+    Scheduler.notifyListeners({state: newState, listeners: state.listeners})
 
     event
         .dataTransfer
