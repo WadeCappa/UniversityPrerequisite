@@ -1,4 +1,4 @@
-import { MakerState } from "./stateConstructor"
+import { MakerState } from "./StateConstructor"
 
 export type SchedulerState = {
     state: MakerState;

@@ -6,8 +6,8 @@ import {
   Route,
   Link,
 } from "react-router-dom";
-import Orgs from "./views/orgs";
-import ScheduleMaker from "./views/schedule_maker/scheduleMaker";
+import Orgs from "./views/Orgs";
+import ScheduleMaker from "./views/schedule_maker/ScheduleMaker";
 
 const router = createBrowserRouter([
   {

@@ -1,8 +1,8 @@
-import { makeState } from './types/stateConstructor';
+import { makeState } from './types/StateConstructor';
 import { SchedulerState } from './types/SchedulerState';
-import { dragOver, dragStart, drop } from './dragAndDrop';
-import { TaskData } from './types/task';
-import { TaskTable } from './types/stateConstructor';
+import { dragOver, dragStart, drop } from './DragAndDrop';
+import { TaskData } from './types/Task';
+import { TaskTable } from './types/StateConstructor';
 import DataEngine from './DataEngine';
 
 // this should be a class that encapsulates the state. If you want to output the state you must give a component to the class. 

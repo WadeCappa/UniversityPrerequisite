@@ -3,7 +3,7 @@ import Scheduler from '../../controllers/scheduler/Scheduler';
 import { SchedulerState } from '../../controllers/scheduler/types/SchedulerState';
 import React from 'react';
 
-import { displayCourses } from "./displayCourses"
+import { displayCourses } from "./DisplayCourses"
 
 type Props = {
   index: number;

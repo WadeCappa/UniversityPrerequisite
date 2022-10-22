@@ -1,4 +1,4 @@
-import { makeState } from "./types/stateConstructor";
+import { makeState } from "./types/StateConstructor";
 import Scheduler from "./Scheduler";
 import { SchedulerState } from "./types/SchedulerState";
 

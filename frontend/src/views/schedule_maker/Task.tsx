@@ -1,4 +1,4 @@
-import { TaskData } from '../../controllers/scheduler/types/task';
+import { TaskData } from '../../controllers/scheduler/types/Task';
 import React from 'react';
 import Scheduler from '../../controllers/scheduler/Scheduler';
 

@@ -1,9 +1,9 @@
 import React from 'react';
-import './scheduler.css';
+import './Scheduler.css';
 import { useEffect, useState } from 'react';
-import Semester from './semester';
-import Header from './header';
-import { displayCourses } from './displayCourses';
+import Semester from './Semester';
+import Header from './Header';
+import { displayCourses } from './DisplayCourses';
 
 // model
 import Scheduler from '../../controllers/scheduler/Scheduler';
