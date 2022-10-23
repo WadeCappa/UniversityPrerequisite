@@ -33,6 +33,7 @@ function ScheduleMaker({university, degrees}: Props) {
         <div className="column">
           <button className="slot" onClick={() => Scheduler.addSemester(makerState)}>Add Semester</button>
           <button className="slot" onClick={() => Scheduler.removeSemester(makerState)}>Remove Semester</button>
+          <button className="slot" onClick={() => Scheduler.clearSemesters(makerState)}>Clear</button>
           {makerState.state.keyLists.slice(1).map((_,i) => {return <Semester index={makerState.state.keyLists.length - (i + 1)} state={makerState} />})}
         </div>
         <div className="column" onDragOver={Scheduler.onDragOver} onDrop={(event) => Scheduler.onDrop(event, 0, makerState)}>

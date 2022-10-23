@@ -1,7 +1,7 @@
 import { makeState } from './types/StateConstructor';
 import { SchedulerState } from './types/SchedulerState';
 import { dragOver, dragStart, drop } from './DragAndDrop';
-import { TaskData } from './types/Task';
+import { TaskData, Focus } from './types/Task';
 import { Organization } from './types/Organization';
 import DataEngine from './DataEngine';
 import { Objective } from './types/Objective';
@@ -28,6 +28,10 @@ export default class Scheduler {
 
     if (university != null && degrees != null) {
       const response = await DataEngine.GetInPathCourses(university, degrees);
+    
+      for (const key in response) {
+        response[key].taskData.focus = 0;
+      }
 
       Scheduler.notifyListeners({
         state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]]),
@@ -44,6 +48,16 @@ export default class Scheduler {
     setState(await DataEngine.GetOrganizations())
   }
   
+  public static visualizeFocus(focus: Focus): string {
+    const focusMap = {
+      0: 'while',
+      1: 'red',
+      2: 'yellow'
+    }
+
+    return focusMap[focus]
+  }
+
   public static onDragStart(event: any, index: number) {
     dragStart(event, index);
   }
@@ -87,5 +101,40 @@ export default class Scheduler {
       listeners: state.listeners
     })
   }
+
+  public static clearSemesters(state: SchedulerState) {
+    Scheduler.notifyListeners({
+      state: makeState(
+        state.state.taskTable,
+        state.state.keyLists.map((_, index) => {
+          if (index == 0) {
+            return state.state.keyLists.flat()
+          }
+          else {
+            return []
+          }
+        })
+      ),
+      listeners: state.listeners
+    })
+  }
   
+  public static onTaskHover(taskID: number, state: SchedulerState) {
+    const newTaskTable = {...state.state.taskTable}
+    newTaskTable[taskID].taskData.focus = 1;
+    
+    newTaskTable[taskID].children.forEach(childrenID => {
+      newTaskTable[childrenID].taskData.focus = 2;
+    })
+
+    Scheduler.notifyListeners({
+      state: makeState(
+        newTaskTable,
+        state.state.keyLists
+      ),
+      listeners: state.listeners
+    })
+  }
+
+
 }
