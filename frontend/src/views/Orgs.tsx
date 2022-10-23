@@ -1,7 +1,8 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import DataEngine from '../controllers/scheduler/DataEngine';
+import Scheduler from '../controllers/scheduler/Scheduler';
 import { Organization } from '../controllers/scheduler/types/Organization';
+import OrganizationView from './OrganizationView';
     // should provide a list of all universities with a search bar (trie search). 
     // Each university should be displayed in a simple box that's been centered, 
     // they each should have a description, their name in bold, a location, and 
@@ -11,13 +12,12 @@ function Orgs() {
     const [organizations, setOrganizations] = useState(startingState);
 
     // This should be done through a controller, the DataEngine should not interact with the view.
-    useEffect(() => {
-        DataEngine.GetOrganizations().then(d => setOrganizations(d))
-    }, []);
+    useEffect(() => {Scheduler.initializeOrganizationData(setOrganizations)}, []);
 
     return (
         <div>
             <h1 className='header'>Organizations</h1>
+            {organizations.map((org, i) => {return <OrganizationView org={org}/>})}
         </div>
     )
 }

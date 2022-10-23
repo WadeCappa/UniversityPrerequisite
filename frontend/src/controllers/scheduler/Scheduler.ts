@@ -2,8 +2,9 @@ import { makeState } from './types/StateConstructor';
 import { SchedulerState } from './types/SchedulerState';
 import { dragOver, dragStart, drop } from './DragAndDrop';
 import { TaskData } from './types/Task';
-import { TaskTable } from './types/StateConstructor';
+import { Organization } from './types/Organization';
 import DataEngine from './DataEngine';
+import { Objective } from './types/Objective';
 
 // this should be a class that encapsulates the state. If you want to output the state you must give a component to the class. 
 
@@ -13,19 +14,27 @@ export default class Scheduler {
     newState.listeners.forEach(f => f(newState));
   }
 
-  public static initializeState(f: (newState: SchedulerState) => void) {
+  public static initializeScheduleMakerState(listeners: (newState: SchedulerState) => void) {
     return {
       state: makeState({}, [[], [], [], [], [], [], [], [], []]),
-      listeners: [f]
+      listeners: [listeners]
     }
   } 
   
-  public static async initializeData(oldState: SchedulerState) {
+  public static async initializeScheduleMakerData(oldState: SchedulerState) {
     const response = await DataEngine.GetInPathCourses();
     Scheduler.notifyListeners({
       state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]]),
       listeners: oldState.listeners
     });
+  }
+
+  public static async initializeObjectivesData(setState: (newState: Objective[]) => void, organizationTitle: string) {
+    setState(await DataEngine.GetDegrees(organizationTitle))
+  }
+
+  public static async initializeOrganizationData(setState: (newState: Organization[]) => void) {
+    setState(await DataEngine.GetOrganizations())
   }
   
   public static onDragStart(event: any, index: number) {

@@ -9,9 +9,9 @@ import { displayCourses } from './DisplayCourses';
 import Scheduler from '../../controllers/scheduler/Scheduler';
 
 function ScheduleMaker() {
-  const [makerState, setMakerState] = useState(Scheduler.initializeState((newState) => setMakerState(newState)));
+  const [makerState, setMakerState] = useState(Scheduler.initializeScheduleMakerState((newState) => setMakerState(newState)));
 
-  useEffect(() => {Scheduler.initializeData(makerState)}, []);  
+  useEffect(() => {Scheduler.initializeScheduleMakerData(makerState)}, []);  
 
   return (
     <div>      
