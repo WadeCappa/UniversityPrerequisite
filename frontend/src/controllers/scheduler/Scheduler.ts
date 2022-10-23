@@ -21,12 +21,19 @@ export default class Scheduler {
     }
   } 
   
-  public static async initializeScheduleMakerData(oldState: SchedulerState) {
-    const response = await DataEngine.GetInPathCourses();
-    Scheduler.notifyListeners({
-      state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]]),
-      listeners: oldState.listeners
-    });
+  public static async initializeScheduleMakerData(
+    oldState: SchedulerState, 
+    university: string | null, 
+    degrees: string | null) {
+
+    if (university != null && degrees != null) {
+      const response = await DataEngine.GetInPathCourses(university, degrees);
+
+      Scheduler.notifyListeners({
+        state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]]),
+        listeners: oldState.listeners
+      });
+    }
   }
 
   public static async initializeObjectivesData(setState: (newState: Objective[]) => void, organizationTitle: string) {

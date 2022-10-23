@@ -36,11 +36,11 @@ object ViewFactory extends Route {
     //  on if this type coercion is possible.
     // TODO: Make sure this takes a list of IDs (as integers) as a parameter, these must map to executables.
     val getCourseMapping: Endpoint[IO, Map[Int, DataNode[Task]]] =
-      get("tasks-for" :: path[String]) { objective: String =>
+      get("tasks-for" :: path[String] :: "at" :: path[String]) { (objective: String, university: String) =>
         dbManager
           .buildQuery[(Int, String, Int, Option[Int], Option[String], Option[String], List[Int], List[List[Int]])](
             cypher"""
-          MATCH (:Executable {title:$objective})-[*..]->(task: Task)
+          MATCH (:Organization {title:$university})-[]->(:Executable {title:$objective})-[*..]->(task: Task)
           WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
           RETURN distinct ID(task), task.subject, task.number, task.weight, task.title, task.description, parents, children
           ORDER BY ID(task)"""

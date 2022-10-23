@@ -14,7 +14,7 @@ function DegreeView({ob, org}: Props) {
         <div className='organizationView'>
             <h2>{ob.title}</h2>
             <p>{ob.description}</p>
-            <Link to={`/scheduler?university=${org}&degrees=${ob.title}`}>
+            <Link to={`/newschedule?university=${org}&degrees=${ob.title}`}>
                 <button className="slot" onClick={() => {}}>Build Schedule</button>
             </Link>
         </div>

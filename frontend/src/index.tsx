@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Orgs from "./views/Orgs";
 import Degrees from "./views/Degrees";
-import ScheduleMaker from "./views/schedule_maker/ScheduleMaker";
+import NewSchedule from "./views/NewSchedule";
 
 const router = createBrowserRouter([
   {
@@ -18,8 +18,8 @@ const router = createBrowserRouter([
     element: <Degrees/>,
   },
   {
-    path: "scheduler",
-    element: <ScheduleMaker/>,
+    path: "newschedule",
+    element: <NewSchedule/>,
   },
 ]);
 
