@@ -9,7 +9,8 @@ export const displayCourses = (state: SchedulerState, originID: number) => {
             <Task 
                 task={task} 
                 origin={originID} 
-                onHover={(taskID: number) => {Scheduler.onTaskHover(taskID, state)}}
+                onEnter={(taskID: number) => {Scheduler.onTaskMouseEnter(taskID, state)}}
+                onLeave={(taskID: number) => {Scheduler.onTaskMouseLeave(taskID, state)}}
             />
         </div>
 

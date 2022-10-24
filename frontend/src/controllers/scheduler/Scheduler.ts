@@ -50,7 +50,7 @@ export default class Scheduler {
   
   public static visualizeFocus(focus: Focus): string {
     const focusMap = {
-      0: 'while',
+      0: 'white',
       1: 'red',
       2: 'yellow'
     }
@@ -119,12 +119,14 @@ export default class Scheduler {
     })
   }
   
-  public static onTaskHover(taskID: number, state: SchedulerState) {
+  public static onTaskMouseEnter(taskID: number, state: SchedulerState) {
     const newTaskTable = {...state.state.taskTable}
     newTaskTable[taskID].taskData.focus = 1;
-    
-    newTaskTable[taskID].children.forEach(childrenID => {
-      newTaskTable[childrenID].taskData.focus = 2;
+
+    newTaskTable[taskID].children.forEach(paths => {
+      paths.forEach(childID => {
+        newTaskTable[childID].taskData.focus = 2;
+      })
     })
 
     Scheduler.notifyListeners({
@@ -136,5 +138,22 @@ export default class Scheduler {
     })
   }
 
+  public static onTaskMouseLeave(taskID: number, state: SchedulerState) {
+    const newTaskTable = {...state.state.taskTable}
+    newTaskTable[taskID].taskData.focus = 0;
+    
+    newTaskTable[taskID].children.forEach(paths => {
+      paths.forEach(childID => {
+        newTaskTable[childID].taskData.focus = 0;
+      })
+    })
 
+    Scheduler.notifyListeners({
+      state: makeState(
+        newTaskTable,
+        state.state.keyLists
+      ),
+      listeners: state.listeners
+    })
+  }
 }

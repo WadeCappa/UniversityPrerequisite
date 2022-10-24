@@ -18,6 +18,6 @@ export type TaskData = {
 export type Task = {
     taskData: TaskData;
     parents: number[];
-    children: number[];
+    children: number[][];
 }
 

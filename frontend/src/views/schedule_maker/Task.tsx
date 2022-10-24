@@ -5,10 +5,11 @@ import Scheduler from '../../controllers/scheduler/Scheduler';
 type Props = {
   task: TaskData;
   origin: number;
-  onHover: (taskID: number) => void;
+  onEnter: (taskID: number) => void;
+  onLeave: (taskID: number) => void;
 }
 
-function Task({task, origin, onHover}: Props) {
+function Task({task, origin, onEnter, onLeave}: Props) {
     return (
       <div 
         className="task" 
@@ -16,8 +17,8 @@ function Task({task, origin, onHover}: Props) {
         onDragStart={(event) => Scheduler.onDragStart(event, origin)} 
         key={`${task.subject} ${task.number}`} 
         id={String(task.taskID)}
-        onMouseEnter={() => {onHover(task.taskID)}}
-        onMouseLeave={() => {}}>
+        onMouseEnter={() => {onEnter(task.taskID)}}
+        onMouseLeave={() => {onLeave(task.taskID)}}>
           {task.subject} {task.number} {"->"} {task.title}
       </div>
     )
