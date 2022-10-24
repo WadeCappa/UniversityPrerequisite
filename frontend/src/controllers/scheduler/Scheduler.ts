@@ -5,6 +5,7 @@ import { TaskData, Focus } from './types/Task';
 import { Organization } from './types/Organization';
 import DataEngine from './DataEngine';
 import { Objective } from './types/Objective';
+import { MakerState } from './types/StateConstructor';
 
 // this should be a class that encapsulates the state. If you want to output the state you must give a component to the class. 
 
@@ -67,6 +68,7 @@ export default class Scheduler {
   }
   
   public static onDrop(event: any, newLocation: number, state: SchedulerState) {
+    Scheduler.resetFocus(state);
     drop(event, newLocation, state);
   }
   
@@ -118,6 +120,21 @@ export default class Scheduler {
       listeners: state.listeners
     })
   }
+
+  private static resetFocus(state: SchedulerState): MakerState {
+    
+    const newTaskTable = {...state.state.taskTable}
+    Object.entries(newTaskTable).forEach(key => {
+      newTaskTable[Number(key[0])].taskData.focus = 0;
+      newTaskTable[Number(key[0])].children.forEach(paths => {
+        paths.forEach(childID => {
+          newTaskTable[childID].taskData.focus = 0;
+        })
+      })
+    })
+
+    return makeState(newTaskTable, state.state.keyLists)
+  }
   
   public static onTaskMouseEnter(taskID: number, state: SchedulerState) {
     const newTaskTable = {...state.state.taskTable}
@@ -139,20 +156,9 @@ export default class Scheduler {
   }
 
   public static onTaskMouseLeave(taskID: number, state: SchedulerState) {
-    const newTaskTable = {...state.state.taskTable}
-    newTaskTable[taskID].taskData.focus = 0;
-    
-    newTaskTable[taskID].children.forEach(paths => {
-      paths.forEach(childID => {
-        newTaskTable[childID].taskData.focus = 0;
-      })
-    })
 
     Scheduler.notifyListeners({
-      state: makeState(
-        newTaskTable,
-        state.state.keyLists
-      ),
+      state: Scheduler.resetFocus(state),
       listeners: state.listeners
     })
   }
