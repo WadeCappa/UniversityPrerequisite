@@ -6,19 +6,17 @@ import cats.effect.{ExitCode, IO, IOApp, Resource}
 import io.finch._
 import io.finch.circe._
 import io.circe.generic.auto._
-import controllers.ViewFactory
 
 import com.twitter.finagle.http.filter.Cors
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finagle.Service
 
 import apiData._
+import controllers.dataController.ViewFactory
+import controllers.dataController.DataController
 
 object Main extends IOApp {
-
-  // TODO: Add the ability to pass args to this from the command line, will be important for future configurations
-  val dbManager = DBManager(DatabaseFactory.newDatabase())
-
+  val dbManager = DBManager();
   def startServer: IO[ListeningServer] = {
     // TODO: Reduce the number of times you repeat yourself here. Each route must be declared in a controller, returned
     //  in an easy to manipulate format, and the combined with the other controllers
@@ -29,10 +27,19 @@ object Main extends IOApp {
       allowsHeaders = _ => Some(Seq("Accept"))
     )
 
+    val dataViews = DataController.generateViews(dbManager)
+
     IO(
       Http.server.serve(
         ":8081",
-        new Cors.HttpFilter(policy).andThen(ViewFactory.getRoutes(dbManager).toServiceAs[Application.Json])
+        new Cors.HttpFilter(policy).andThen(
+          (
+            dataViews.getOrgs :+:
+              dataViews.getOrgCourses :+:
+              dataViews.getCourseMapping :+:
+              dataViews.getObjectives
+          ).toServiceAs[Application.Json]
+        )
       )
     )
   }

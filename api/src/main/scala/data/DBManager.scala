@@ -9,7 +9,7 @@ import io.finch._
 import neo4s.core.CypherQuery
 import org.neo4j.driver.{Config, Logging}
 
-case class DBManager(db: Aux[IO, Unit]) {
+case class DBManager() {
 
   def buildQuery[A: Read](
     cypher: CypherQuery
@@ -41,19 +41,10 @@ case class DBManager(db: Aux[IO, Unit]) {
     func: (Neo4jTransactor[IO], CypherQuery) => IO[A],
     cypher: CypherQuery
   ): IO[A] = {
-
-    // TODO: Move this to an environment variable
-    val NEO4J_URI = "bolt://localhost:7687/db/neo4j"
-
-    Neo4jTransactor
-      .create[IO](
-        NEO4J_URI,
-        Config.builder().withLogging(Logging.slf4j()).build(),
-        org.neo4j.driver.AuthTokens.basic("neo4j", "notproductionpassword")
-      )
+    TransactorFactory
+      .newTransactor()
       .use { transactor =>
         func(transactor, cypher)
       }
-
   }
 }
