@@ -1,14 +1,14 @@
 # Elixir
-/api/_build
-/api/cover
-/api/deps
-/api/doc
-/api/.fetch
-/api/erl_crash.dump
-/api/*.ez
-/api/*.beam
-/api/config/*.secret.exs
-/api/.elixir_ls/
+/backend/_build
+/backend/cover
+/backend/deps
+/backend/doc
+/backend/.fetch
+/backend/erl_crash.dump
+/backend/*.ez
+/backend/*.beam
+/backend/config/*.secret.exs
+/backend/.elixir_ls/
 **/*.secret.exs
 
 # Planning 

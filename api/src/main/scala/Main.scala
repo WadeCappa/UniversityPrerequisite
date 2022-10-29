@@ -8,11 +8,8 @@ import io.finch.circe._
 import io.circe.generic.auto._
 
 import com.twitter.finagle.http.filter.Cors
-import com.twitter.finagle.http.{Request, Response}
-import com.twitter.finagle.Service
 
 import apiData._
-import controllers.dataController.ViewFactory
 import controllers.dataController.DataController
 
 object Main extends IOApp {
