@@ -53,7 +53,8 @@ export default class Scheduler {
     const focusMap = {
       0: 'white',
       1: 'red',
-      2: 'yellow'
+      2: 'yellow',
+      3: 'green'
     }
 
     return focusMap[focus]
