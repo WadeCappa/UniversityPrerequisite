@@ -8,6 +8,8 @@ defmodule BackendWeb.Router do
   scope "/data/", BackendWeb do
     pipe_through :serveData
     get "/organizations", ServeData, :getOrganizations
+    get "/objectives", ServeData, :getObjectives
+    get "/tasks", ServeData, :getInPathTasks
   end
 
   # Enables LiveDashboard only for development

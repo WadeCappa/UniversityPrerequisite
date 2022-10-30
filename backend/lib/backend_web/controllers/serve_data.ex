@@ -2,13 +2,21 @@ defmodule BackendWeb.ServeData do
   use BackendWeb, :controller
 
   def getOrganizations(conn, _params) do
-    {:ok, _pid} = Bolt.Sips.start_link(url: "prereq://localhost", port: 7687, basic_auth: [username: "neo4j", password: "localpass"])
+    json conn, BackendWeb.DatabaseManager.fetchData("match (o: Organization) return ID(o) as id, o.title as title, o.slots_per_bucket as slots_per_bucket")
+  end
 
-    connection = Bolt.Sips.conn()
-    %Bolt.Sips.Response{results: res} = Bolt.Sips.query!(connection, "match (o: Organization) return ID(o), o.title, o.slots_per_bucket")
+  def getObjectives(conn, %{"orgTitle" => organizationTitle} = _params) do
+    json conn, BackendWeb.DatabaseManager.fetchData(
+      "match (:Organization {title:#{organizationTitle}})-[]->(r:Objective) return ID(r) as id, r.title as title"
+    )
+  end
 
-    IO.inspect(res)
-
-    json conn, res
+  def getInPathTasks(conn, %{"tasks-for" => degrees, "at" => organizationTitle} = _params) do
+    json conn, BackendWeb.DatabaseManager.fetchData(
+      "MATCH (:Organization {title:#{organizationTitle}})-[]->(:Executable {title:#{degrees}})-[*..]->(task: Task)
+      WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
+      RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
+      ORDER BY ID(task)"
+    )
   end
 end
