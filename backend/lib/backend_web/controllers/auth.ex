@@ -8,19 +8,39 @@ defmodule BackendWeb.Auth do
     # First check if user exists
       # if user exists get user data (including unqiue ID), then generate and return token
       # else return error
+
+    [%{"id" => userID} | _tail] = BackendWeb.DatabaseManager.runCypher(
+      "MATCH (u:User{email:'#{email}', password:'#{hashPassword(password)}'}) return ID(u) as id"
+    )
+
+    json conn, generateJWT(userID)
   end
 
   def createAccount(conn, %{"email" => email, "password" => password} = _params) do
+    json conn, BackendWeb.DatabaseManager.runCypher("CREATE (u:User {email:'#{email}', password:'#{hashPassword(password)}'}) return u")
+
     # try to create account (password must be hashed, research if you should has in frontend or backend)
       # if failed then email is not unique, return response
       # else create user in database, run data through sign in
   end
 
-  def generateJWT(userID) do
+  def validateJWT_DEBUG(conn, %{"JWT" => jwt} = _params) do
+    {:ok, code} = validateJWT(jwt)
+    json conn, code
+  end
+
+
+  defp hashPassword(password) do
+    # in the future, deterministically hash password
+      # Bcrypt.Base.hash_password(password, Bcrypt.Base.gen_salt(12, true))
+    password
+  end
+
+  defp generateJWT(userID) do
     Phoenix.Token.sign(BackendWeb.Endpoint, @signing_salt, userID)
   end
 
-  def validateJWT(token) do
+  defp validateJWT(token) do
     Phoenix.Token.verify(BackendWeb.Endpoint, @signing_salt, token, max_age: @token_age_secs)
   end
 

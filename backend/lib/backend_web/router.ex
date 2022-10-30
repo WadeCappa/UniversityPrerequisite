@@ -18,8 +18,9 @@ defmodule BackendWeb.Router do
 
   scope "/auth/", BackendWeb do
     pipe_through :auth
-    get "/genToken", Auth, :generateJWT
-    get "/verifyToken", Auth, :validateJWT
+    get "/createAccount", Auth, :createAccount
+    get "/signin", Auth, :signIn
+    get "/checkToken", Auth, :validateJWT_DEBUG
   end
 
   # Enables LiveDashboard only for development
