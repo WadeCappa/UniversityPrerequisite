@@ -14,7 +14,6 @@ config :backend, BackendWeb.Endpoint,
   pubsub_server: Backend.PubSub,
   live_view: [signing_salt: "3QQ61Bg/"]
 
-
 config :bolt_sips, Bolt,
   hostname: 'localhost',
   port: 7687,

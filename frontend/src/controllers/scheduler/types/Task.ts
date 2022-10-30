@@ -4,19 +4,14 @@ export enum Focus {
     InPath = 2,
 }
 
-
 export type TaskData = {
-    taskID: number;
+    id: number;
     subject: String;
     number: number;
     slotWeight: number;
     title: String;
     description: String;
     focus: Focus;
-}
-
-export type Task = {
-    taskData: TaskData;
     parents: number[];
     children: number[][];
 }

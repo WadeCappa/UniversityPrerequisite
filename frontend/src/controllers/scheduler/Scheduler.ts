@@ -31,7 +31,7 @@ export default class Scheduler {
       const response = await DataEngine.GetInPathCourses(university, degrees);
     
       for (const key in response) {
-        response[key].taskData.focus = 0;
+        response[key].focus = 0;
       }
 
       Scheduler.notifyListeners({
@@ -74,7 +74,7 @@ export default class Scheduler {
   }
   
   public static tasksToTaskData(state: SchedulerState, originID: number): TaskData[] {
-    return state.state.keyLists[originID].map(id => state.state.taskTable[id].taskData).sort((a, b) => {
+    return state.state.keyLists[originID].map(id => state.state.taskTable[id]).sort((a, b) => {
       return (a.subject == b.subject) ? Number(a.number < b.number) : Number(a.subject > b.subject);
     })
   }
@@ -126,10 +126,10 @@ export default class Scheduler {
     
     const newTaskTable = {...state.state.taskTable}
     Object.entries(newTaskTable).forEach(key => {
-      newTaskTable[Number(key[0])].taskData.focus = 0;
+      newTaskTable[Number(key[0])].focus = 0;
       newTaskTable[Number(key[0])].children.forEach(paths => {
         paths.forEach(childID => {
-          newTaskTable[childID].taskData.focus = 0;
+          newTaskTable[childID].focus = 0;
         })
       })
     })
@@ -139,11 +139,11 @@ export default class Scheduler {
   
   public static onTaskMouseEnter(taskID: number, state: SchedulerState) {
     const newTaskTable = {...state.state.taskTable}
-    newTaskTable[taskID].taskData.focus = 1;
+    newTaskTable[taskID].focus = 1;
 
     newTaskTable[taskID].children.forEach(paths => {
       paths.forEach(childID => {
-        newTaskTable[childID].taskData.focus = 2;
+        newTaskTable[childID].focus = 2;
       })
     })
 

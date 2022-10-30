@@ -16,9 +16,9 @@ function Task({task, origin, onEnter, onLeave}: Props) {
         draggable="true" 
         onDragStart={(event) => Scheduler.onDragStart(event, origin)} 
         key={`${task.subject} ${task.number}`} 
-        id={String(task.taskID)}
-        onMouseEnter={() => {onEnter(task.taskID)}}
-        onMouseLeave={() => {onLeave(task.taskID)}}>
+        id={String(task.id)}
+        onMouseEnter={() => {onEnter(task.id)}}
+        onMouseLeave={() => {onLeave(task.id)}}>
           {task.subject} {task.number} {"->"} {task.title}
       </div>
     )

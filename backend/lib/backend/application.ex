@@ -18,6 +18,8 @@ defmodule Backend.Application do
       # {Backend.Worker, arg}
     ]
 
+    BackendWeb.DatabaseManager.startDBConnection()
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Backend.Supervisor]

@@ -2,7 +2,7 @@ defmodule BackendWeb.ServeData do
   use BackendWeb, :controller
 
   def getOrganizations(conn, _params) do
-    json conn, BackendWeb.DatabaseManager.fetchData("match (o: Organization) return ID(o) as id, o.title as title, o.slots_per_bucket as slots_per_bucket")
+    json conn, BackendWeb.DatabaseManager.fetchData("match (o: Organization) return ID(o) as ordID, o.title as title, o.slots_per_bucket as slots_per_bucket")
   end
 
   def getObjectives(conn, %{"orgTitle" => organizationTitle} = _params) do

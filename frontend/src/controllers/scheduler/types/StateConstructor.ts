@@ -1,4 +1,4 @@
-import { Task } from "./Task"
+import { TaskData } from "./Task"
 
 export type MakerState = {
     taskTable: TaskTable;
@@ -6,7 +6,7 @@ export type MakerState = {
 }
 
 export type TaskTable = {
-    [id: number]: Task;
+    [id: number]: TaskData;
 }
 
 export function makeState (taskTable: TaskTable, keyLists: number[][]): MakerState {
