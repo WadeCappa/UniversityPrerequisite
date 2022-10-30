@@ -125,6 +125,7 @@ export default class Scheduler {
   private static resetFocus(state: SchedulerState): MakerState {
     
     const newTaskTable = {...state.state.taskTable}
+
     Object.entries(newTaskTable).forEach(key => {
       newTaskTable[Number(key[0])].focus = 0;
       newTaskTable[Number(key[0])].children.forEach(paths => {
