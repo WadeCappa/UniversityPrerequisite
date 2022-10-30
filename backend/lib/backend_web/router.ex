@@ -12,6 +12,16 @@ defmodule BackendWeb.Router do
     get "/tasks", ServeData, :getInPathTasks
   end
 
+  pipeline :auth do
+    plug(:accepts, ["json"])
+  end
+
+  scope "/auth/", BackendWeb do
+    pipe_through :auth
+    get "/genToken", Auth, :generateJWT
+    get "/verifyToken", Auth, :validateJWT
+  end
+
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put
