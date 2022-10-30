@@ -16,8 +16,10 @@ function Orgs() {
 
     return (
         <div>
-            <h1 className='header'>Organizations</h1>
-            {organizations.map((org, i) => {return <OrganizationView org={org}/>})}
+            <div className='header'>
+                <h1>Organizations</h1>
+                {organizations.map((org, i) => {return <OrganizationView org={org}/>})}
+            </div>
         </div>
     )
 }

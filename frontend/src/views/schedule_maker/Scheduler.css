@@ -1,14 +1,22 @@
 
 .row {
   display: flex;
-  height: 80vh;
+  height: 100vh;
   overflow: hidden;
 }
 
-.column {
+.columnRight {
+  flex: 50%;
+  margin-left: 5px;
+  border: solid;
+  padding: 5px;
+  overflow: auto;
+}
+
+.columnLeft {
   flex: 50%;
   border: solid;
-  margin: 10px;
+  margin-right: 5px;
   padding: 5px;
   overflow: auto;
 }
@@ -33,11 +41,28 @@
   border: solid;
 }
 
+.main {
+  margin: 10px;
+}
+
+.homeButton {
+  padding: 5px;
+  padding-left: 50px;
+  padding-right: 50px;
+  border: solid;
+}
+
 .header {
   text-align: center;
   border: solid;
   padding: 40px;
-  margin: 10px;
+}
+
+.navbar {
+  text-align: left;
+  border: solid;
+  padding: 5px;
+  margin-bottom: 5px;
 }
 
 .organizationView {

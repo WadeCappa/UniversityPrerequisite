@@ -1,0 +1,22 @@
+import React from 'react';
+import './views/schedule_maker/Scheduler.css'
+import { Link } from 'react-router-dom';
+
+function NavBar() {
+    return (
+        <div className='navbar'>
+            <Link to={"/"}>
+                <button className='homeButton'>
+                    Schedule Builder
+                </button>
+            </Link>
+            <Link to={"/login"}>
+                <button className='slot'>
+                    login
+                </button>
+            </Link>
+        </div>
+    )
+}
+
+export default NavBar;

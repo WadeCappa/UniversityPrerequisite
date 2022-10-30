@@ -18,8 +18,10 @@ function Degrees() {
 
     return (
         <div>
-            <h1 className='header'>{organization}</h1>
-            {objectives.map(ob => <DegreeView ob={ob} org={organization}/>)}
+            <div className='header'>
+                <h1>{organization}</h1>
+                {objectives.map(ob => <DegreeView ob={ob} org={organization}/>)}
+            </div>
         </div>
     )
 }
