@@ -5,6 +5,8 @@ defmodule BackendWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  # Every route should return a map with either %{res: data} or %{error: exception}. The frontend will then be able
+  # to gracefully handle errounous requests.
   scope "/data/", BackendWeb do
     pipe_through :serveData
     get "/organizations", ServeData, :getOrganizations

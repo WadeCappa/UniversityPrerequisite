@@ -43,7 +43,8 @@ defmodule Backend.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:bolt_sips, "~> 2.0"},
       {:corsica, "~> 1.1.3"},
-      {:bcrypt_elixir, "~> 3.0.1"}
+      {:bcrypt_elixir, "~> 3.0.1"},
+      {:comeonin, "~> 5.3.3"}
     ]
   end
 
