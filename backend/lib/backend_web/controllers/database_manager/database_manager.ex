@@ -6,7 +6,11 @@ defmodule BackendWeb.DatabaseManager do
 
   def runCypher(cypher) do
     # do pattern matching here to handle errors
-    %{results: res} = sendCommand(cypher)
+    res = case sendCommand(cypher) do
+      {:ok, %Bolt.Sips.Response{results: data}} -> data
+      {:error, %Bolt.Sips.Error{code: error_code, message: error_message}} -> %{code: error_code, message: error_message}
+    end
+
     res
   end
 

@@ -8,25 +8,27 @@ defmodule BackendWeb.Auth do
     # First check if user exists
       # if user exists get user data (including unqiue ID), then generate and return token
       # else return error
-
     case BackendWeb.DatabaseManager.runCypher(
-      "MATCH (u:User{email:'#{email}', password:'#{hashPassword(password)}'}) return ID(u) as id"
+      "MATCH (u:User{email:'#{email}'}) return u.password as password, ID(u) as id"
     ) do
+      [%{"id" => userID, "password" => oldPassword} | _] -> if Bcrypt.verify_pass(password, oldPassword) do
+        json conn, %{jwt: generateJWT(userID)}
+      else
+        json conn, %{error: "No matching credentials"}
+      end
+      %{code: error_code, message: error_message} -> json conn, %{code: error_code, message: error_message}
       [] -> json conn, %{error: "No matching credentials"}
-      [res | _] -> json conn, %{jwt: generateJWT(res)}
     end
   end
 
   def createAccount(conn, %{"email" => email, "password" => password} = _params) do
-    res = case BackendWeb.DatabaseManager.sendCommand(
+    res = case BackendWeb.DatabaseManager.runCypher(
       "CREATE (u:User {email:'#{email}', password:'#{hashPassword(password)}'}) return ID(u) as id"
     ) do
-      %{results: res} -> %{jwt: res}
-      error -> %{error: "An account using that email already exists"}
+      %{code: error_code, message: error_message} -> json conn, %{code: error_code, message: error_message}
+      [res | _] -> json conn, %{jwt: generateJWT(res)}
+      [] -> json conn, %{error: "No matching credentials"}
     end
-
-    json conn, res
-
     # try to create account (password must be hashed, research if you should has in frontend or backend)
       # if failed then email is not unique, return response
       # else create user in database, run data through sign in
