@@ -7,7 +7,7 @@ function Login() {
     const [state, setState] = useState({email: "", password: ""})
 
     return (
-        <div>
+        <div className='header'>
             <form>
                 <div>
                     <label>Email:
@@ -18,7 +18,7 @@ function Login() {
                 </div>
                 <div>
                     <label>password:
-                        <input type="text" 
+                        <input type="password" 
                             onChange={(event) => setState({...state, password: event.target.value})}
                         />
                     </label>

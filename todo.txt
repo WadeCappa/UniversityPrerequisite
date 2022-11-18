@@ -1,22 +1,17 @@
-1) Rebuild backend with Scala
-	1) Connect PostgreSQL database
-	2) Build data-fetching (and cleaning) singleton
-	3) Build routes to send data in JSON
-	4) Build data-receiving and processing singleton
+1) Backend todo
+	1) Build data-receiving and processing singleton
 		1) New/updated Schedule
 			1) Check to see if input schedule has cycle
 			2) Check to see if input schedule contains valid courses
 		2) new/updated Course
 			1) Check to see if it is valid and doesn't create cycles in database (neo4j might be able to do this automatically in the future)
-	5) Eventually transition over to NEO4J instead of PostgreSQL  
-2) Make scripts to auto populate the database. Use the models you declared in the backend. 
-	1) The scripts should be able to be launched from sbt with a special keyword
+		3) Provide an algoirthm in the elixir backend to generate an optimized schedule. This is an NP hard problem, so it should be non-trivial (even if you use the niave solution, mulit-thread it so that it is fast). 
 
-3) Frontend 
+2) Frontend 
 	1) User authentication
 		1) Users can sign in with google
 			1) find most secure authentication method
-		2) backend supports this
+		2) backend needs to support this.
 	2) Users can create schedules
 		1) auto validation happens in the frontend as you work
 			1) courses that don't have all their prereqs are highlight in red
@@ -31,4 +26,18 @@
 	5) people can view schedules by major, college
 	6) people can be on the site and look at colleges, courses
 	
+
+USES THAT MUST BE SUPPORTED IN MVP:
+- [ ] Users can create schedules
+	- [ ] Schedules can be auto generated (NP hard problem) 
+	- [ ] Users are told how to make a valid schedule
+	- [ ] Users can save schedules as public or private
+- [ ] User generated schedules can be browsed by school and by degree
+	- [ ] User schedules can be forked
+	- [ ] Each schedule is maintained by a single user only
+	- [ ] A user can like a schedule to find it again later (like YouTube)
+- [ ] Users can add data to schools (add courses, update courses, add prereq paths)
+
+
+
 sudo -u postgres psql	

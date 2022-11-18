@@ -40,6 +40,7 @@ const router = createBrowserRouter([
         path: "login",
         element: 
         <div>
+            <NavBar/>
             <Login/>
         </div>
     }

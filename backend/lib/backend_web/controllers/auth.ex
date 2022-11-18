@@ -9,9 +9,14 @@ defmodule BackendWeb.Auth do
       # if user exists get user data (including unqiue ID), then generate and return token
       # else return error
 
-    json conn, generateJWT(BackendWeb.DatabaseManager.runCypher(
+    case BackendWeb.DatabaseManager.runCypher(
       "MATCH (u:User{email:'#{email}', password:'#{hashPassword(password)}'}) return ID(u) as id"
-    ))
+    ) do
+      [] -> json conn, %{error: "No matching credentials"}
+      [res | _] -> json conn, %{jwt: generateJWT(res)}
+    end
+
+
   end
 
   def createAccount(conn, %{"email" => email, "password" => password} = _params) do
@@ -30,7 +35,6 @@ defmodule BackendWeb.Auth do
 
   defp hashPassword(password) do
     %{:password_hash => hash} = Bcrypt.add_hash(password)
-    IO.inspect(hash)
     hash
   end
 
