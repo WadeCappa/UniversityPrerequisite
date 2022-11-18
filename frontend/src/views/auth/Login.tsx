@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import SessionController from '../../controllers/session/SessionController';
 
 function Login() {
@@ -24,7 +25,7 @@ function Login() {
                     </label>
                 </div>
             </form>
-            <button onClick={() => {
+            <button className='slot' onClick={() => {
                 // call API, if user exists return JWT, else return error 
                 // wait for API response
                     // if JWT 
@@ -35,6 +36,11 @@ function Login() {
             }}>
                 login
             </button>
+            <Link style={{marginLeft:10}} to={"/signup"}>
+                <button className='slot'>
+                    Create Account?
+                </button>
+            </Link>
         </div>
     )
   }

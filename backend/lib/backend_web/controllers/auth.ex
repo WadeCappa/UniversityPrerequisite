@@ -15,12 +15,17 @@ defmodule BackendWeb.Auth do
       [] -> json conn, %{error: "No matching credentials"}
       [res | _] -> json conn, %{jwt: generateJWT(res)}
     end
-
-
   end
 
   def createAccount(conn, %{"email" => email, "password" => password} = _params) do
-    json conn, BackendWeb.DatabaseManager.runCypher("CREATE (u:User {email:'#{email}', password:'#{hashPassword(password)}'}) return u")
+    res = case BackendWeb.DatabaseManager.sendCommand(
+      "CREATE (u:User {email:'#{email}', password:'#{hashPassword(password)}'}) return ID(u) as id"
+    ) do
+      %{results: res} -> %{jwt: res}
+      error -> %{error: "An account using that email already exists"}
+    end
+
+    json conn, res
 
     # try to create account (password must be hashed, research if you should has in frontend or backend)
       # if failed then email is not unique, return response

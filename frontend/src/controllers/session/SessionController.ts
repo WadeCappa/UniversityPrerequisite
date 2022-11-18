@@ -6,4 +6,10 @@ export default class SessionController {
         console.log(jwt)
         // store JWT as a cookie
     }
+
+    public static async signin(email: string, password: string) {
+        const jwt: string = await DataEngine.NewAccount(email, password)
+        console.log(jwt)
+        // store JWT as a cookie
+    }
 }

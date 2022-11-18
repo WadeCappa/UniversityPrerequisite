@@ -10,6 +10,7 @@ import Orgs from "./views/Orgs";
 import Degrees from "./views/Degrees";
 import NewSchedule from "./views/NewSchedule";
 import Login from "./views/auth/Login";
+import Signup from "./views/auth/Signup";
 
 const router = createBrowserRouter([
     {
@@ -42,6 +43,14 @@ const router = createBrowserRouter([
         <div>
             <NavBar/>
             <Login/>
+        </div>
+    },
+    {
+        path: "signup",
+        element: 
+        <div>
+            <NavBar/>
+            <Signup/>
         </div>
     }
   ]);

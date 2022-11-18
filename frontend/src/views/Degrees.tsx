@@ -20,7 +20,7 @@ function Degrees() {
         <div>
             <div className='header'>
                 <h1>{organization}</h1>
-                {objectives.map(ob => <DegreeView ob={ob} org={organization}/>)}
+                {objectives.map((ob, i) => <DegreeView ob={ob} org={organization} key={i}/>)}
             </div>
         </div>
     )

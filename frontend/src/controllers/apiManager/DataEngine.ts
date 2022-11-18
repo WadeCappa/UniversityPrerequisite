@@ -21,4 +21,8 @@ export default class DataEngine {
     public static async GetJWT(email: string, password: string): Promise<string> {
         return await (await fetch(`${DataEngine.url}/auth/signin?email=${email}&password=${password}`)).json() as string
     }
+
+    public static async NewAccount(email: string, password: string): Promise<string> {
+        return await (await fetch(`${DataEngine.url}/auth/createAccount?email=${email}&password=${password}`)).json() as string
+    }
 }

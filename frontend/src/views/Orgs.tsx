@@ -18,7 +18,7 @@ function Orgs() {
         <div>
             <div className='header'>
                 <h1>Organizations</h1>
-                {organizations.map((org, i) => {return <OrganizationView org={org}/>})}
+                {organizations.map((org, i) => {return <OrganizationView org={org} key={i}/>})}
             </div>
         </div>
     )

@@ -10,8 +10,8 @@ defmodule BackendWeb.DatabaseManager do
     res
   end
 
-  defp sendCommand(cypher) do
-    Bolt.Sips.query!(Bolt.Sips.conn(), cypher)
+  def sendCommand(cypher) do
+    Bolt.Sips.query(Bolt.Sips.conn(), cypher)
   end
 
 end
