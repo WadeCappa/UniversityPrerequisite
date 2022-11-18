@@ -19,6 +19,8 @@
 			2) the majors of interest are highlighted in red if not all requirements met
 			3) Users can search for classes and add them to their list
 			4) the user is told if the schedule they are editing is valid
+		2) It's the right side of the screen (the course catalog) that shows the majors and categories required. It groups courses under collapsable banners of each major, then within each major there are categories that are also collapsable (such as SOFTWARE courses for CPTS). 
+			1) Courses that belong in multiple categories go into a new banner outside of both majors labled as such (courses that fit into both majors). These courses are further organized into categories that they both satifsy the requirements for within a major.
 	3) Users can save schedules	
 		1) on save the backend validates their schedule, sent back error or comfirmation.
 		2) users can still save invalid schedules, but they will be marked as such
