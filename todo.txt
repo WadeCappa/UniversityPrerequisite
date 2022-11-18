@@ -9,10 +9,10 @@
 
 2) Frontend 
 	1) User authentication
-		1) Users can sign in with google
+		1) Users can sign in with google -> done
 			1) find most secure authentication method
-		2) backend needs to support this.
-	2) Users can create schedules
+		2) backend needs to support this. -> send auth tokens to backend as header, backend verifies
+	2) Users can create schedules 
 		1) auto validation happens in the frontend as you work
 			1) courses that don't have all their prereqs are highlight in red
 				1) when you hover over one of these courses, prereq paths are shown in yellow with a number denoting their pathID
@@ -26,6 +26,8 @@
 	5) people can view schedules by major, college
 	6) people can be on the site and look at colleges, courses
 	
+
+
 
 USES THAT MUST BE SUPPORTED IN MVP:
 - [ ] Users can create schedules
