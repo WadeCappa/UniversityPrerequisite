@@ -13,9 +13,11 @@ import Login from "./views/auth/Login";
 import Signup from "./views/auth/Signup";
 import { GoogleLoginResponse } from "react-google-login";
 
+import SessionController from "./controllers/session/SessionController";
+
 
 function App() {
-    const [profile, setProfile] = useState({} as GoogleLoginResponse["profileObj"])
+    const [profile, setProfile] = useState({} as GoogleLoginResponse)
 
     const router = createBrowserRouter([
         {
@@ -47,7 +49,7 @@ function App() {
             element: 
             <div>
                 <NavBar profile={profile}/>
-                <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
+                <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse) => {setProfile(newProfile)}}/>
             </div>
         },
         {

@@ -1,21 +1,22 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SessionController from '../../controllers/session/SessionController';
 
 import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline, GoogleLogout } from 'react-google-login';
 import { gapi } from 'gapi-script';
 
-const clientId = '281191567907-9qeih35rrvfh68a4i84oor6stttj5rd2.apps.googleusercontent.com'
+const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID ? process.env.REACT_APP_GOOGLE_CLIENT_ID : ""
 
 type Props = {
-    profile: GoogleLoginResponse["profileObj"];
-    setProfile: (newProfile: GoogleLoginResponse["profileObj"]) => void;
+    profile: GoogleLoginResponse;
+    setProfile: (newProfile: GoogleLoginResponse) => void;
 }
 
 function Login({profile, setProfile}: Props) {
     // part of the logic engine needs to manage the state of these forms (just the sending part)
     const [state, setState] = useState({email: "", password: ""})
+    const navigate = useNavigate();
 
     useEffect(() => {
         const initClient = () => {
@@ -34,7 +35,7 @@ function Login({profile, setProfile}: Props) {
     const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         console.log(res)
         if (isResponseOnline(res)) {
-            setProfile(res.profileObj);
+            setProfile(res);
         }
     };
 
@@ -43,13 +44,13 @@ function Login({profile, setProfile}: Props) {
     };
 
     const logOut = () => {
-        setProfile({} as GoogleLoginResponse["profileObj"]);
+        setProfile({} as GoogleLoginResponse);
     };
 
 
     return (
         <div className='header'>
-            <form>
+            {/* <form>
                 <div>
                     <label>Email:
                         <input type="text" 
@@ -82,26 +83,25 @@ function Login({profile, setProfile}: Props) {
                 <button className='slot'>
                     Create Account?
                 </button>
-            </Link>
-            <div>
+            </Link> */}
+            <div>                
                 <div>
-                    <img src={profile.imageUrl} alt="user image" />
-                    <h3>{profile.imageUrl ? "User is logged in" : "User not logged in"}</h3>
-                    <p>Name: {profile.name}</p>
-                    <p>Email Address: {profile.email}</p>
+                    <h3>{profile.profileObj.imageUrl ? "User is logged in" : "User not logged in"}</h3>
+                    <p>Name: {profile.profileObj.name}</p>
+                    <p>Email Address: {profile.profileObj.email}</p>
                     <br />
+                    <GoogleLogin
+                        clientId={clientId}
+                        buttonText="Sign in with Google"
+                        onSuccess={onSuccess}
+                        onFailure={onFailure}
+                        cookiePolicy={'single_host_origin'}
+                        isSignedIn={true}
+                    />
                     <br />
+                    <br/>
                     <GoogleLogout clientId={clientId} buttonText="Log out" onLogoutSuccess={logOut} />
                 </div>
-                <br />
-                <GoogleLogin
-                    clientId={clientId}
-                    buttonText="Sign in with Google"
-                    onSuccess={onSuccess}
-                    onFailure={onFailure}
-                    cookiePolicy={'single_host_origin'}
-                    isSignedIn={true}
-                />
             </div>
 
         </div>

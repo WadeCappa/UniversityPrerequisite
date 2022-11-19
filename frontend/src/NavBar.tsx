@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { GoogleLoginResponse } from "react-google-login";
 
 type Props = {
-    profile: GoogleLoginResponse["profileObj"];
+    profile: GoogleLoginResponse;
 }
 
 function NavBar({profile}: Props) {
