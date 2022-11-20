@@ -17,14 +17,14 @@ import SessionController from "./controllers/session/SessionController";
 
 
 function App() {
-    const [profile, setProfile] = useState({} as GoogleLoginResponse)
+    const [profile, setProfile] = useState({} as GoogleLoginResponse["profileObj"])
 
     const router = createBrowserRouter([
         {
           path: "/",
           element: 
             <div>
-                <NavBar profile={profile}/>
+                <NavBar />
                 <Orgs/>
             </div> ,
         },
@@ -32,7 +32,7 @@ function App() {
           path: "degrees/",
           element: 
             <div>
-                <NavBar profile={profile}/>
+                <NavBar />
                 <Degrees/>
             </div>,
         },
@@ -40,7 +40,7 @@ function App() {
           path: "newschedule",
           element: 
             <div>
-                <NavBar profile={profile}/>
+                <NavBar />
                 <NewSchedule/>
             </div>,
         },
@@ -48,15 +48,15 @@ function App() {
             path: "login",
             element: 
             <div>
-                <NavBar profile={profile}/>
-                <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse) => {setProfile(newProfile)}}/>
+                <NavBar />
+                <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
             </div>
         },
         {
             path: "signup",
             element: 
             <div>
-                <NavBar profile={profile}/>
+                <NavBar />
                 <Signup/>
             </div>
         }

@@ -3,11 +3,11 @@ import './views/schedule_maker/Scheduler.css'
 import { Link } from 'react-router-dom';
 import { GoogleLoginResponse } from "react-google-login";
 
-type Props = {
-    profile: GoogleLoginResponse;
-}
+// type Props = {
+//     profile: GoogleLoginResponse;
+// }
 
-function NavBar({profile}: Props) {
+function NavBar() {
     return (
         <div className='navbar'>
             <Link to={"/"}>

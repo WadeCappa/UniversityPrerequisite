@@ -9,8 +9,8 @@ import { gapi } from 'gapi-script';
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID ? process.env.REACT_APP_GOOGLE_CLIENT_ID : ""
 
 type Props = {
-    profile: GoogleLoginResponse;
-    setProfile: (newProfile: GoogleLoginResponse) => void;
+    profile: GoogleLoginResponse["profileObj"];
+    setProfile: (newProfile: GoogleLoginResponse["profileObj"]) => void;
 }
 
 function Login({profile, setProfile}: Props) {
@@ -35,7 +35,8 @@ function Login({profile, setProfile}: Props) {
     const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         console.log(res)
         if (isResponseOnline(res)) {
-            setProfile(res);
+            setProfile(res.profileObj);
+            navigate('/')
         }
     };
 
@@ -44,7 +45,7 @@ function Login({profile, setProfile}: Props) {
     };
 
     const logOut = () => {
-        setProfile({} as GoogleLoginResponse);
+        setProfile({} as GoogleLoginResponse["profileObj"]);
     };
 
 
@@ -86,9 +87,9 @@ function Login({profile, setProfile}: Props) {
             </Link> */}
             <div>                
                 <div>
-                    <h3>{profile.profileObj.imageUrl ? "User is logged in" : "User not logged in"}</h3>
-                    <p>Name: {profile.profileObj.name}</p>
-                    <p>Email Address: {profile.profileObj.email}</p>
+                    <h3>{profile.imageUrl ? "User is logged in" : "User not logged in"}</h3>
+                    <p>Name: {profile.name}</p>
+                    <p>Email Address: {profile.email}</p>
                     <br />
                     <GoogleLogin
                         clientId={clientId}
