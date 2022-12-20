@@ -14,10 +14,8 @@ class DatabaseManager
     runQuery = async(cypherText) => {
         const session = this.driver.session({ database: 'neo4j' });
         const result = await this.queryDatabase(cypherText, session);
-        result.records.forEach(record => {
-            console.log(`Found: ${record.get("p.subject"), record.get("p.number")}`)
-        });
         session.close();
+        return result.records;
     }
 
     queryDatabase = async(cypherText, session) => {
@@ -25,7 +23,6 @@ class DatabaseManager
     }
 
 };
-
 
 
 module.exports = DatabaseManager

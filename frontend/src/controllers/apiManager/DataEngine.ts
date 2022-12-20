@@ -4,18 +4,18 @@ import { Objective } from "../scheduler/types/Objective";
 
 export default class DataEngine {
     // should be enviroment variable
-    private static url = "http://localhost:4000"
+    private static url = "http://localhost:3001"
 
     public static async GetInPathCourses(university: string, degrees: string): Promise<TaskTable> {
-        return await (await fetch(`${DataEngine.url}/data/tasks?tasks-for="${degrees}"&at="${university}"`)).json() as TaskTable;
+        return await (await fetch(`${DataEngine.url}/tasks?tasks-for=${degrees}&at=${university}`)).json() as TaskTable;
     }
 
     public static async GetOrganizations(): Promise<Organization[]> {
-        return await (await fetch(`${DataEngine.url}/data/organizations/`)).json() as Organization[]
+        return await (await fetch(`${DataEngine.url}/organizations/`)).json() as Organization[]
     }
 
     public static async GetDegrees(organizationTitle: string): Promise<Objective[]> {
-        return await (await fetch(`${DataEngine.url}/data/objectives?orgTitle="${organizationTitle}"`)).json() as Objective[]
+        return await (await fetch(`${DataEngine.url}/objectives?orgTitle=${organizationTitle}`)).json() as Objective[]
     }
 
     public static async GetJWT(email: string, password: string): Promise<string> {
