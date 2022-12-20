@@ -88,3 +88,10 @@ api_v2/.bsp
 ./frontend/thumb
 ./frontend/sketch
 
+# Express
+/backend/startscript.sh
+
+/backend/node_modules
+/backend/package-lock.json
+/backend/*.log
+/backend/*.gz
