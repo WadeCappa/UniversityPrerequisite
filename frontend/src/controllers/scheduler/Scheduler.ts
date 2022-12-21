@@ -22,10 +22,10 @@ export default class Scheduler {
     }
   } 
   
-  public static async initializeScheduleMakerData(
+  public static async initializeScheduleMakerData (
     oldState: SchedulerState, 
     university: string | null, 
-    degrees: string | null) {
+    degrees: string | null ) {
 
     if (university != null && degrees != null) {
       const response = await DataEngine.GetInPathCourses(university, degrees);
@@ -38,6 +38,9 @@ export default class Scheduler {
         state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]]),
         listeners: oldState.listeners
       });
+    }
+    else {
+      console.log("error, univeristy and degrees are null");
     }
   }
 

@@ -20,3 +20,13 @@ MATCH (:Executable {title:"B.S in Computer Science"})-[*..]->(task: Task)
 WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
 RETURN distinct ID(task), task.subject, task.number, parents, children
 ORDER BY ID(task)
+
+MATCH (:Organization {title:"Washington State University"})-[]->(:Executable {title:"B.S in Computer Science"})-[*..]->(task: Task)
+WITH task, [(task)<-[:REQUIRES]-(x:Task) | ID(x)] AS parents,  [(x:Task)<-[:REQUIRES]-(task) | ID(x)] AS children
+RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
+ORDER BY ID(task)
+
+MATCH (:Organization {title:"Washington State University"})-[]->(:Executable {title:"B.S in Computer Science"})-[*..]->(task: Task)
+WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
+RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
+ORDER BY ID(task)

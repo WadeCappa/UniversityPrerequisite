@@ -24,6 +24,7 @@ function ScheduleMaker({university, degrees}: Props) {
   const [makerState, setMakerState] = useState(Scheduler.initializeScheduleMakerState((newState) => setMakerState(newState)));
 
   useEffect(() => {Scheduler.initializeScheduleMakerData(makerState, university, degrees)}, []);  
+
   return (
     <div>      
       <div className="row">

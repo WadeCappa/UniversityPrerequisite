@@ -7,7 +7,8 @@ export default class DataEngine {
     private static url = "http://localhost:3001"
 
     public static async GetInPathCourses(university: string, degrees: string): Promise<TaskTable> {
-        return await (await fetch(`${DataEngine.url}/tasks?tasks-for=${degrees}&at=${university}`)).json() as TaskTable;
+        console.log(`${DataEngine.url}/tasks?tasks-for=${degrees}&at=${university}`)
+        return await (await fetch(`${DataEngine.url}/tasks?for=${degrees}&at=${university}`)).json() as TaskTable;
     }
 
     public static async GetOrganizations(): Promise<Organization[]> {

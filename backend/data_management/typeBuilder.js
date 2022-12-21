@@ -22,10 +22,11 @@ class TypeBuilder
             "id": record.get("id").low,
             "subject": record.get("subject"),
             "number": record.get("number").low,
-            "weight": record.get("weight").low,
+            "slotWeight": record.get("weight").low,
             "title": record.get("title"),
             "description": record.get("description"),
             "parents": record.get("parents").map(r => r.low),
+            "children": record.get("children").map(r => r.map(e => e.low))
         }
     }
 
