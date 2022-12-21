@@ -2,16 +2,24 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+require('dotenv').config()
+
 const DatabaseManager = require('./data_management/runCypher.js')
 const TypeBuilder = require("./data_management/typeBuilder")
 
 const dbManager = new DatabaseManager();
 const typeBuilder = new TypeBuilder();
 
-const app = express();
-const port = process.env.PORT || 3000;
 
-app.use(cors());
+const app = express();
+const port = process.env.PORT;
+
+app.use(
+    cors({
+      origin: ["http://localhost:3000"],
+      methods: "GET,POST,PUT,DELETE,OPTIONS",
+    })
+  );
 
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
