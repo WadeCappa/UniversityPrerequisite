@@ -5,7 +5,9 @@ const cors = require('cors');
 require('dotenv').config()
 
 const cookieParser = require("cookie-parser");
-const sessions = require('express-session');
+const session = require('cookie-session');
+const jwt = require('jsonwebtoken');
+
 
 const DatabaseManager = require('./data_management/databaseManager.js')
 const TypeBuilder = require("./data_management/typeBuilder");
@@ -20,42 +22,32 @@ const port = process.env.PORT;
 
 app.use(
     cors({
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3001/tasks?for=B.S%20in%20Computer%20Science&at=Washington%20State%20University"],
         methods: "GET,POST,PUT,DELETE,OPTIONS",
     })
 );
 
 // Configuring body parser middleware
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cookieParser());
 
-const oneDay = 1000 * 60 * 60 * 24;
-app.use(sessions({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized:true,
-    cookie: { maxAge: oneDay },
-    resave: false 
-}));
-
-app.use(async (req, res, next) => {
-    console.log(`checking if user exists ..., looking at ${Object.keys(req.cookies)}`)
-    if (req.session !== undefined && req.session.userId !== undefined)
+app.use((req, res, next) => {
+    console.log("checking to see if the auth headers exist...")
+    console.log(req.cookies.JWT_TOKEN)
+    if (req.headers['authorization'] !== undefined)
     {
-        console.log(`session is not undefined, session = ${Object.keys(req.session)}`)
-        const user = await authManager.checkIfUserExists(req.session.userId, dbManager)
-        console.log(`user credentials: ${user}`)
-        req.user = user
+        console.log("auth headers exist!")
+        authManager.authenticateToken();
     }
     next()
 })
 
 app.post('/auth/login', (req, res) => {
     console.log("signing user in...")
-    authManager.handleUserSignin(req.body.token, dbManager).then(user => {
-        req.session.userId = user.userId
+    authManager.createNewUser(req.body.token, dbManager).then(user => {
         res.status(201)
-        res.json(user)
+        res.json(authManager.generateAccessToken(user.userId, user.email, user.name))
     });
 })
 

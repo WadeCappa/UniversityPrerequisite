@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
+import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline, GoogleLogout } from "react-google-login";
 import { gapi } from 'gapi-script';
 import DataEngine from '../../controllers/apiManager/DataEngine';
 import Cookies from 'universal-cookie';
@@ -32,8 +32,10 @@ function GoogleAuthComponentHandler({profile, setProfile}: Props) {
 
     const onSuccess = async (googleData: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if (isResponseOnline(googleData)) {
-            const backend_response = await (await DataEngine.Login(googleData.tokenId)).json()   
-            setProfile(backend_response);
+            const new_jwt = await (await DataEngine.Login(googleData.tokenId)).json()   
+            setProfile(new_jwt);
+            document.cookie = `token=${new_jwt}`
+            console.log(new_jwt)
             navigate('/')
         }
     };
@@ -46,16 +48,31 @@ function GoogleAuthComponentHandler({profile, setProfile}: Props) {
         setProfile({} as GoogleLoginResponse["profileObj"]);
     };
 
-    return (
-        <GoogleLogin
-            clientId={clientId}
-            buttonText="Sign in with Google"
-            onSuccess={onSuccess}
-            onFailure={onFailure}
-            cookiePolicy={'single_host_origin'}
-            isSignedIn={true}
-        />
-    )
+    if (Object.keys(profile).length === 0)
+    {
+        return (
+            <GoogleLogin
+                clientId={clientId}
+                buttonText="Sign in with Google"
+                onSuccess={onSuccess}
+                onFailure={onFailure}
+                cookiePolicy={'single_host_origin'}
+                isSignedIn={true}
+            />
+        )
+    }
+    else 
+    {
+        return (
+            <GoogleLogout 
+                clientId={clientId} 
+                buttonText="Log out" 
+                onLogoutSuccess={logOut} 
+            />
+        )
+    }
+
+
 }
 
 export default GoogleAuthComponentHandler;

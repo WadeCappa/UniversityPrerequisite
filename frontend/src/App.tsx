@@ -44,14 +44,6 @@ function App() {
                 <NewSchedule/>
             </div>,
         },
-        // {
-        //     path: "login",
-        //     element: 
-        //     <div>
-        //         <NavBar />
-        //         <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
-        //     </div>
-        // },
         {
             path: "signup",
             element: 

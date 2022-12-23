@@ -1,10 +1,11 @@
 const { OAuth2Client } = require('google-auth-library')
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID)
 const DatabaseManager = require('../data_management/databaseManager')
+const jwt = require('jsonwebtoken');
 
 class AuthenticationManager 
 {
-    handleUserSignin = async (token, dbManager) => {       
+    createNewUser = async (token, dbManager) => {       
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.REACT_APP_GOOGLE_CLIENT_ID
@@ -31,6 +32,26 @@ class AuthenticationManager
             `
         )
     }
+
+    generateAccessToken(user_id, user_email, user_name) {
+        return jwt.sign({user_id, user_email, user_name}, process.env.JWT_SECRET, { expiresIn: '1800s' });
+    }
+
+    authenticateToken(req, res, next) {
+        const authHeader = req.headers['authorization']
+        const token = authHeader && authHeader.split(' ')[1]
+      
+        if (token == null) return res.sendStatus(401)
+      
+        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+            console.log(err)
+        
+            if (err) return res.sendStatus(403)
+        
+            req.user = user
+        })
+    }
+      
 }
 
 module.exports = AuthenticationManager
