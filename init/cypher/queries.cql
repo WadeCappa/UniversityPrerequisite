@@ -29,4 +29,10 @@ ORDER BY ID(task)
 MATCH (:Organization {title:"Washington State University"})-[]->(:Executable {title:"B.S in Computer Science"})-[*..]->(task: Task)
 WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
 RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
-ORDER BY ID(task)
+ORDER BY ID(task)'
+
+// create or update user
+MERGE (u:User {email: "${email}"})
+ON CREATE SET u.name = "${name}", u.picture = "${picture}"
+ON MATCH  SET u.name = "${name}", u.picture = "${picture}"
+RETURN u

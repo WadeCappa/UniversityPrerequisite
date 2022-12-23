@@ -4,12 +4,13 @@ const cors = require('cors');
 
 require('dotenv').config()
 
-const DatabaseManager = require('./data_management/runCypher.js')
-const TypeBuilder = require("./data_management/typeBuilder")
+const DatabaseManager = require('./data_management/databaseManager.js')
+const TypeBuilder = require("./data_management/typeBuilder");
+const AuthenticationManager = require('./user_management/authenticationManager.js');
 
 const dbManager = new DatabaseManager();
+const authManager = new AuthenticationManager();
 const typeBuilder = new TypeBuilder();
-
 
 const app = express();
 const port = process.env.PORT;
@@ -24,6 +25,36 @@ app.use(
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(async (req, res, next) => {
+    if (req.session !== undefined)
+    {
+        const user = await authManager.checkIfUserExists(req, res, dbManager)
+        req.user = user
+    }
+    next()
+})
+
+app.post('/auth/login', (req, res) => {
+    authManager.handleUserSignin(req, res, dbManager).then(user => {
+        req.session.userId = user.id
+        res.status(201)
+        res.json(user)
+    });
+})
+
+app.delete("/auth/logout", async (req, res) => {
+    await req.session.destroy()
+    res.status(200)
+    res.json({
+        message: "Logged out successfully"
+    })
+})
+
+app.get("/auth/me", async (req, res) => {
+    res.status(200)
+    res.json(req.user)
+})
 
 app.get('/organizations', (req, res) => {
     dbManager.runQuery("match (o: Organization) return ID(o) as ordID, o.title as title, o.slots_per_bucket as slots_per_bucket").then((output) => {

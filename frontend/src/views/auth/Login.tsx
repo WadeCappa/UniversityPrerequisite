@@ -51,40 +51,6 @@ function Login({profile, setProfile}: Props) {
 
     return (
         <div className='header'>
-            {/* <form>
-                <div>
-                    <label>Email:
-                        <input type="text" 
-                            onChange={(event) => setState({...state, email: event.target.value})}
-                        />
-                    </label>
-                </div>
-                <div>
-                    <label>password:
-                        <input type="password" 
-                            onChange={(event) => setState({...state, password: event.target.value})}
-                        />
-                    </label>
-                </div>
-            </form>
-            <button className='slot' onClick={async () => {
-                // call API, if user exists return JWT, else return error 
-                const jwt: string = await SessionController.login(state.email, state.password)
-                console.log(jwt)
-
-                // wait for API response
-                    // if JWT 
-                        // save JWT as a cookie. 
-                        // Then push onto react router history the home screen
-                    // else display error, do nothing else. 
-            }}>
-                login
-            </button>
-            <Link  to={"/signup"}>
-                <button className='slot'>
-                    Create Account?
-                </button>
-            </Link> */}
             <div>                
                 <div>
                     <h3>{profile.imageUrl ? "User is logged in" : "User not logged in"}</h3>

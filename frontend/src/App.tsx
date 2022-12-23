@@ -24,7 +24,7 @@ function App() {
           path: "/",
           element: 
             <div>
-                <NavBar />
+                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
                 <Orgs/>
             </div> ,
         },
@@ -32,7 +32,7 @@ function App() {
           path: "degrees/",
           element: 
             <div>
-                <NavBar />
+                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
                 <Degrees/>
             </div>,
         },
@@ -40,23 +40,23 @@ function App() {
           path: "newschedule",
           element: 
             <div>
-                <NavBar />
+                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
                 <NewSchedule/>
             </div>,
         },
-        {
-            path: "login",
-            element: 
-            <div>
-                <NavBar />
-                <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
-            </div>
-        },
+        // {
+        //     path: "login",
+        //     element: 
+        //     <div>
+        //         <NavBar />
+        //         <Login profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
+        //     </div>
+        // },
         {
             path: "signup",
             element: 
             <div>
-                <NavBar />
+                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
                 <Signup/>
             </div>
         }
