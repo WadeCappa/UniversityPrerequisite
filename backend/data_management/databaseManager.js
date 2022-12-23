@@ -12,17 +12,20 @@ class DatabaseManager
         this.driver = neo4j.driver(this.uri, neo4j.auth.basic(this.user, this.password));
     }
 
-    runQuery = async(cypherText) => {
+    runTransaction = async (databaseTransaction) => {
         const session = this.driver.session({ database: 'neo4j' });
-        const result = await this.queryDatabase(cypherText, session);
+        const result = await databaseTransaction(session);
         session.close();
         return result.records;
     }
 
-    queryDatabase = async(cypherText, session) => {
-        return await session.executeRead(tx => tx.run(cypherText));
+    runQuery = async(cypherText) => {
+        return await this.runTransaction(async (session) => await session.executeRead(tx => tx.run(cypherText)));
     }
 
+    runMutation = async(cypherText) => {
+        return await this.runTransaction(async (session) => await session.executeWrite(tx => tx.run(cypherText)))
+    }
 };
 
 

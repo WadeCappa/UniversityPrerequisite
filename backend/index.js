@@ -4,6 +4,9 @@ const cors = require('cors');
 
 require('dotenv').config()
 
+const cookieParser = require("cookie-parser");
+const sessions = require('express-session');
+
 const DatabaseManager = require('./data_management/databaseManager.js')
 const TypeBuilder = require("./data_management/typeBuilder");
 const AuthenticationManager = require('./user_management/authenticationManager.js');
@@ -17,34 +20,47 @@ const port = process.env.PORT;
 
 app.use(
     cors({
-      origin: ["http://localhost:3000"],
-      methods: "GET,POST,PUT,DELETE,OPTIONS",
+        origin: ["http://localhost:3000"],
+        methods: "GET,POST,PUT,DELETE,OPTIONS",
     })
-  );
+);
 
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
+
+const oneDay = 1000 * 60 * 60 * 24;
+app.use(sessions({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false 
+}));
 
 app.use(async (req, res, next) => {
-    if (req.session !== undefined)
+    console.log(`checking if user exists ..., looking at ${Object.keys(req.cookies)}`)
+    if (req.session !== undefined && req.session.userId !== undefined)
     {
-        const user = await authManager.checkIfUserExists(req, res, dbManager)
+        console.log(`session is not undefined, session = ${Object.keys(req.session)}`)
+        const user = await authManager.checkIfUserExists(req.session.userId, dbManager)
+        console.log(`user credentials: ${user}`)
         req.user = user
     }
     next()
 })
 
 app.post('/auth/login', (req, res) => {
-    authManager.handleUserSignin(req, res, dbManager).then(user => {
-        req.session.userId = user.id
+    console.log("signing user in...")
+    authManager.handleUserSignin(req.body.token, dbManager).then(user => {
+        req.session.userId = user.userId
         res.status(201)
         res.json(user)
     });
 })
 
 app.delete("/auth/logout", async (req, res) => {
-    await req.session.destroy()
+    req.session.destroy()
     res.status(200)
     res.json({
         message: "Logged out successfully"

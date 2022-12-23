@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { gapi } from 'gapi-script';
+import DataEngine from '../../controllers/apiManager/DataEngine';
+import Cookies from 'universal-cookie';
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID ? process.env.REACT_APP_GOOGLE_CLIENT_ID : ""
 
@@ -29,21 +31,9 @@ function GoogleAuthComponentHandler({profile, setProfile}: Props) {
       };
 
     const onSuccess = async (googleData: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-        console.log(googleData)
         if (isResponseOnline(googleData)) {
-
-            const backend_response = await fetch("/auth/login", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        token: googleData.tokenId
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })  
-            
-            const data = await backend_response.json()
-            setProfile(data.profileObj);
+            const backend_response = await (await DataEngine.Login(googleData.tokenId)).json()   
+            setProfile(backend_response);
             navigate('/')
         }
     };

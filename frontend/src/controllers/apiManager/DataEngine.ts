@@ -26,4 +26,16 @@ export default class DataEngine {
     public static async NewAccount(email: string, password: string): Promise<string> {
         return await (await fetch(`${DataEngine.url}/auth/createAccount?email=${email}&password=${password}`)).json() as string
     }
+
+    public static async Login(userId: string): Promise<Response> {
+        return await fetch(`${DataEngine.url}/auth/login`, {
+                method: "POST",
+                body: JSON.stringify({
+                    token: userId
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
 }
