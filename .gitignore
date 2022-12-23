@@ -73,20 +73,21 @@ api_v2/project/**/metals.sbt
 api_v2/.bsp
 
 # react
-./frontend/.DS_*
-./frontend/*.log
-./frontend/logs
-./frontend/**/*.backup.*
-./frontend/**/*.back.*
+/frontend/.DS_*
+/frontend/*.log
+/frontend/logs
+/frontend/**/*.backup.*
+/frontend/**/*.back.*
 
-./frontend/node_modules
-./frontend/bower_components
+/frontend/node_modules
+/frontend/bower_components
 
-./frontend/*.sublime*
+/frontend/*.sublime*
+/frontend/.env
 
-./frontend/psd
-./frontend/thumb
-./frontend/sketch
+/frontend/psd
+/frontend/thumb
+/frontend/sketch
 
 # Express
 /backend/startscript.sh
