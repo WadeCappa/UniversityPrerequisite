@@ -37,19 +37,26 @@ class AuthenticationManager
         return jwt.sign({user_id, user_email, user_name}, process.env.JWT_SECRET, { expiresIn: '1800s' });
     }
 
-    authenticateToken(req, res, next) {
+    authenticateTokenMiddleware(req, res, next) {
         const authHeader = req.headers['authorization']
+        console.log(authHeader)
         const token = authHeader && authHeader.split(' ')[1]
+
+        console.log(`looking at token ${token}`)
       
-        if (token == null) return res.sendStatus(401)
+        if (token === null || token === undefined || token === 'undefined') {
+            console.log("no auth token")
+            return res.sendStatus(401)
+        }
       
         jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-            console.log(err)
-        
-            if (err) return res.sendStatus(403)
-        
+            if (err) {
+                console.log(err);
+                return res.sendStatus(403);
+            }      
             req.user = user
         })
+        next()
     }
       
 }

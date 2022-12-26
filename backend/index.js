@@ -32,17 +32,6 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-    console.log("checking to see if the auth headers exist...")
-    console.log(req.cookies.JWT_TOKEN)
-    if (req.headers['authorization'] !== undefined)
-    {
-        console.log("auth headers exist!")
-        authManager.authenticateToken();
-    }
-    next()
-})
-
 app.post('/auth/login', (req, res) => {
     console.log("signing user in...")
     authManager.createNewUser(req.body.token, dbManager).then(user => {
@@ -78,7 +67,7 @@ app.get('/objectives', (req, res) => {
     })
 })
 
-app.get('/tasks', (req, res) => {
+app.get('/tasks', authManager.authenticateTokenMiddleware, (req, res) => {
     const degrees = req.query.for;
     const orgTitle = req.query.at
 

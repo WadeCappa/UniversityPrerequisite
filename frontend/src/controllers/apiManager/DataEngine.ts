@@ -6,7 +6,7 @@ export default class DataEngine {
     // should be enviroment variable
     private static url = "http://localhost:3001"
 
-    public static async GetInPathCourses(university: string, degrees: string): Promise<TaskTable> {
+    public static async GetInPathCourses(university: string, degrees: string, jwt: string): Promise<TaskTable> {
         console.log(`${DataEngine.url}/tasks?tasks-for=${degrees}&at=${university}`)
         return await (
             await fetch(
@@ -14,7 +14,8 @@ export default class DataEngine {
                 {
                     method: 'GET',
                     headers:{
-                      'Content-Type': 'application/json'
+                      'Content-Type': 'application/json',
+                      'authorization': `bearer ${jwt}`,
                     },
                     credentials: "same-origin",
                 }

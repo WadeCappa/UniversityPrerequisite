@@ -4,12 +4,13 @@ import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline, GoogleLog
 import { gapi } from 'gapi-script';
 import DataEngine from '../../controllers/apiManager/DataEngine';
 import Cookies from 'universal-cookie';
+import { UserData } from '../../controllers/scheduler/types/UserData';
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID ? process.env.REACT_APP_GOOGLE_CLIENT_ID : ""
 
 type Props = {
-    profile: GoogleLoginResponse["profileObj"];
-    setProfile: (newProfile: GoogleLoginResponse["profileObj"]) => void;
+    profile: UserData;
+    setProfile: (newProfile: UserData) => void;
 }
 
 function GoogleAuthComponentHandler({profile, setProfile}: Props) {
@@ -33,7 +34,14 @@ function GoogleAuthComponentHandler({profile, setProfile}: Props) {
     const onSuccess = async (googleData: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if (isResponseOnline(googleData)) {
             const new_jwt = await (await DataEngine.Login(googleData.tokenId)).json()   
-            setProfile(new_jwt);
+            setProfile({
+                jwt: new_jwt,
+                imageUrl: googleData.profileObj.imageUrl,
+                email: googleData.profileObj.email,
+                name: googleData.profileObj.name,
+                givenName: googleData.profileObj.givenName,
+                familyName: googleData.profileObj.familyName,
+            } as UserData);
             document.cookie = `token=${new_jwt}`
             console.log(new_jwt)
             navigate('/')
@@ -45,13 +53,13 @@ function GoogleAuthComponentHandler({profile, setProfile}: Props) {
     };
 
     const logOut = () => {
-        setProfile({} as GoogleLoginResponse["profileObj"]);
+        setProfile({} as UserData);
     };
 
     if (Object.keys(profile).length === 0)
     {
         return (
-            <GoogleLogin
+            <GoogleLogin 
                 clientId={clientId}
                 buttonText="Sign in with Google"
                 onSuccess={onSuccess}

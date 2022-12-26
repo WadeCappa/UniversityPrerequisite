@@ -9,46 +9,45 @@ import NavBar from "./NavBar";
 import Orgs from "./views/Orgs";
 import Degrees from "./views/Degrees";
 import NewSchedule from "./views/NewSchedule";
-import Login from "./views/auth/Login";
+import { UserData } from "./controllers/scheduler/types/UserData";
 import Signup from "./views/auth/Signup";
 import { GoogleLoginResponse } from "react-google-login";
 
 import SessionController from "./controllers/session/SessionController";
 
-
 function App() {
-    const [profile, setProfile] = useState({} as GoogleLoginResponse["profileObj"])
+    const [profile, setProfile] = useState({} as UserData)
 
     const router = createBrowserRouter([
         {
           path: "/",
           element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
-                <Orgs/>
+                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <Orgs userData={profile}/>
             </div> ,
         },
         {
           path: "degrees/",
           element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
-                <Degrees/>
+                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <Degrees userData={profile}/>
             </div>,
         },
         {
           path: "newschedule",
           element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
-                <NewSchedule/>
+                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <NewSchedule userData={profile}/>
             </div>,
         },
         {
             path: "signup",
             element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: GoogleLoginResponse["profileObj"]) => {setProfile(newProfile)}}/>
+                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
                 <Signup/>
             </div>
         }

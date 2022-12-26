@@ -25,10 +25,12 @@ export default class Scheduler {
   public static async initializeScheduleMakerData (
     oldState: SchedulerState, 
     university: string | null, 
-    degrees: string | null ) {
+    degrees: string | null,
+    jwt: string
+  ) {
 
     if (university != null && degrees != null) {
-      const response = await DataEngine.GetInPathCourses(university, degrees);
+      const response = await DataEngine.GetInPathCourses(university, degrees, jwt);
     
       for (const key in response) {
         response[key].focus = 0;

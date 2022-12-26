@@ -2,12 +2,18 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import Scheduler from '../controllers/scheduler/Scheduler';
 import { Organization } from '../controllers/scheduler/types/Organization';
+import { UserData } from '../controllers/scheduler/types/UserData';
 import OrganizationView from './OrganizationView';
     // should provide a list of all universities with a search bar (trie search). 
     // Each university should be displayed in a simple box that's been centered, 
     // they each should have a description, their name in bold, a location, and 
     // an image of a logo.
-function Orgs() {
+
+type Props = {
+    userData: UserData
+}
+
+function Orgs({userData}: Props) {
     const startingState: Organization[] = []
     const [organizations, setOrganizations] = useState(startingState);
 
