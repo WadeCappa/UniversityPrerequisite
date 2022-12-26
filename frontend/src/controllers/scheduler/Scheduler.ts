@@ -110,6 +110,12 @@ export default class Scheduler {
     })
   }
 
+  public static sumCurrentTaskWeights(state: SchedulerState, targetIndex: number): number {
+    return state.state.keyLists[targetIndex].reduce((cumulativeWeights: number, course: number) => {
+      return cumulativeWeights + state.state.taskTable[course].slotWeight
+    }, 0)
+  }
+
   public static clearSemesters(state: SchedulerState) {
     Scheduler.notifyListeners({
       state: makeState(

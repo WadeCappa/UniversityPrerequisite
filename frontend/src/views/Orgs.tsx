@@ -20,12 +20,31 @@ function Orgs({userData}: Props) {
     // This should be done through a controller, the DataEngine should not interact with the view.
     useEffect(() => {Scheduler.initializeOrganizationData(setOrganizations)}, []);
 
+    const tableRows: Organization[][] = []
+    const itemsPerRow = 3
+    
+    organizations.forEach((org: Organization, i: number) => {
+        if (i % itemsPerRow == 0) {
+            tableRows.push([])
+        }
+
+        tableRows.at(-1)?.push(org)
+    })
+
     return (
         <div>
             <div className='header'>
                 <h1>Organizations</h1>
-                {organizations.map((org, i) => {return <OrganizationView org={org} key={i}/>})}
             </div>
+            <table style={{width:'100%'}}>
+                {tableRows.map((orgs: Organization[], rowIndex: number) => {
+                    return <tr>
+                        {orgs.map((org: Organization, colIndex: number) => {
+                            return <td>{<OrganizationView org={org} key={rowIndex*itemsPerRow + colIndex}/>}</td>
+                        })}
+                    </tr>
+                })}
+            </table>
         </div>
     )
 }

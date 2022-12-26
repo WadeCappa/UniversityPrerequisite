@@ -16,3 +16,11 @@ export const displayCourses = (state: SchedulerState, originID: number) => {
 
     )})
 }
+
+export const displayCapacity = (state: SchedulerState, originID: number) => {
+    return (
+        <div>
+            {Scheduler.sumCurrentTaskWeights(state, originID)} / 18
+        </div>
+    )
+}

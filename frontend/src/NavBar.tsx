@@ -17,16 +17,20 @@ function NavBar({profile, setProfile}: Props) {
 
     return (
         <div className='navbar'>
-            <Link to={"/"}>
-                <button className='homeButton'>
-                    Schedule Builder
-                </button>
-            </Link>
+            <div className='taskLeft'>
+                <Link to={"/"}>
+                    <button className='homeButton'>
+                        Schedule Builder
+                    </button>
+                </Link>
+            </div>
             
-            <GoogleAuthComponentHandler       
-                profile={profile} 
-                setProfile={setProfile}        
-            />
+            <div className='taskRight' style={{marginRight:'20px'}}>
+                <GoogleAuthComponentHandler       
+                    profile={profile} 
+                    setProfile={setProfile}        
+                />
+            </div>
 
         </div>
     )

@@ -18,8 +18,15 @@ function Task({task, origin, onEnter, onLeave}: Props) {
         key={`${task.subject} ${task.number}`} 
         id={String(task.id)}
         onMouseEnter={() => {onEnter(task.id)}}
-        onMouseLeave={() => {onLeave(task.id)}}>
-          {task.subject} {task.number} {"->"} {task.title}
+        onMouseLeave={() => {onLeave(task.id)}}
+        >
+          <div className='taskLeft'>
+            {task.subject} {task.number} {"->"} {task.title} 
+          </div>
+          <div className='taskRight'>
+            Credits: {task.slotWeight}
+          </div>  
+          
       </div>
     )
   }

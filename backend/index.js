@@ -59,6 +59,14 @@ app.get('/organizations', (req, res) => {
     })
 });
 
+app.get('/parent_organization', (req, res) => {
+    const orgTitle = req.query.orgTitle;
+
+    dbManager.runQuery(`match (o: Organization {title:"${orgTitle}"}) return ID(o) as ordID, o.title as title, o.slots_per_bucket as slots_per_bucket`).then((output) => {
+        res.json(output.map(r => typeBuilder.buildOrganization(r)));
+    })
+})
+
 app.get('/objectives', (req, res) => {
     const orgTitle = req.query.orgTitle;
 
