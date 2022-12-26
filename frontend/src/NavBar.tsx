@@ -5,15 +5,18 @@ import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "re
 import { gapi } from 'gapi-script';
 import GoogleAuthComponentHandler from './views/auth/GoogleAuthComponentHandler';
 import { UserData } from './controllers/scheduler/types/UserData';
+import ProfileHandler from './views/auth/ProfileHandler';
 
 const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID ? process.env.REACT_APP_GOOGLE_CLIENT_ID : ""
 
 type Props = {
-    profile: UserData;
-    setProfile: (newProfile: UserData) => void;
+    navData: {
+        profile: UserData;
+        setProfile: (newProfile: UserData) => void;
+    }
 }
 
-function NavBar({profile, setProfile}: Props) {
+function NavBar({navData}: Props) {
 
     return (
         <div className='navbar'>
@@ -27,8 +30,8 @@ function NavBar({profile, setProfile}: Props) {
             
             <div className='taskRight' style={{marginRight:'20px'}}>
                 <GoogleAuthComponentHandler       
-                    profile={profile} 
-                    setProfile={setProfile}        
+                    profile={navData.profile} 
+                    setProfile={navData.setProfile}        
                 />
             </div>
 

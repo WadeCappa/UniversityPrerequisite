@@ -14,16 +14,27 @@ import Signup from "./views/auth/Signup";
 import { GoogleLoginResponse } from "react-google-login";
 
 import SessionController from "./controllers/session/SessionController";
+import { MakerState } from "./controllers/scheduler/types/StateConstructor";
+
+type Props = {
+  profile: UserData,
+  setProfile: (newProfile: UserData) => void,
+}
 
 function App() {
     const [profile, setProfile] = useState({} as UserData)
+
+    const navBarProps = {
+      profile: profile, 
+      setProfile: (newProfile: UserData) => {setProfile(newProfile)},
+    } as Props
 
     const router = createBrowserRouter([
         {
           path: "/",
           element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <NavBar navData={navBarProps}/>
                 <Orgs userData={profile}/>
             </div> ,
         },
@@ -31,7 +42,7 @@ function App() {
           path: "degrees/",
           element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <NavBar navData={navBarProps}/>
                 <Degrees userData={profile}/>
             </div>,
         },
@@ -39,7 +50,7 @@ function App() {
           path: "newschedule",
           element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <NavBar navData={navBarProps}/>
                 <NewSchedule userData={profile}/>
             </div>,
         },
@@ -47,7 +58,7 @@ function App() {
             path: "signup",
             element: 
             <div>
-                <NavBar profile={profile} setProfile={(newProfile: UserData) => {setProfile(newProfile)}}/>
+                <NavBar navData={navBarProps}/>
                 <Signup/>
             </div>
         }

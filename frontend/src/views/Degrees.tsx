@@ -27,6 +27,18 @@ function Degrees({userData}: Props) {
                 <h1>{organization}</h1>
                 {objectives.map((ob, i) => <DegreeView ob={ob} org={organization} key={i}/>)}
             </div>
+
+            <div className="row">
+
+                <div className="columnLeft">
+                    Eventually turn this into a drag and drop situation, figure out how to let a user drag the degrees they want to complete 
+                    with their schedule (this will probably take some time to implement).
+                </div>
+
+                <div className="columnRight" >
+                    e
+                </div>
+            </div> 
         </div>
     )
 }

@@ -75,7 +75,7 @@ app.get('/objectives', (req, res) => {
     })
 })
 
-app.get('/tasks', authManager.authenticateTokenMiddleware, (req, res) => {
+app.get('/tasks', (req, res) => {
     const degrees = req.query.for;
     const orgTitle = req.query.at
 
