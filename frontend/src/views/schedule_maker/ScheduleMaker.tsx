@@ -9,14 +9,18 @@ import { useSearchParams } from 'react-router-dom';
 // model
 import Scheduler from '../../controllers/scheduler/Scheduler';
 import { UserData } from '../../controllers/scheduler/types/UserData';
+import ScheduleButtonBar from './ScheduleButtonBar';
 
 type Props = {
   university: string | null,
   degrees: string | null,
-  userData: UserData,
+  navData: {
+    profile: UserData;
+    setProfile: (newProfile: UserData) => void;
+  }
 }
 
-function ScheduleMaker({university, degrees, userData}: Props) {
+function ScheduleMaker({university, degrees, navData}: Props) {
   const [queryParameters] = useSearchParams()
 
   // Get the id of the schedule you are currently working on, query the DB to pull up your progress. If the current ID does not match anything
@@ -25,10 +29,15 @@ function ScheduleMaker({university, degrees, userData}: Props) {
 
   const [makerState, setMakerState] = useState(Scheduler.initializeScheduleMakerState((newState) => setMakerState(newState)));
 
-  useEffect(() => {Scheduler.initializeScheduleMakerData(makerState, university, degrees, userData.jwt)}, []);  
+  useEffect(() => {Scheduler.initializeScheduleMakerData(makerState, university, degrees, navData.profile.jwt)}, []);  
 
   return (
     <div>      
+
+      <div>
+        <ScheduleButtonBar navData={navData} state={makerState.state}/>
+      </div>
+
       <div className="row">
 
         <div className="columnLeft">

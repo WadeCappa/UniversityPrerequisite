@@ -96,4 +96,5 @@ api_v2/.bsp
 /backend/package-lock.json
 /backend/*.log
 /backend/*.gz
-/backend/.env
+/backend/src/.env
+/backend/dist

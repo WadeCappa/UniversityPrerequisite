@@ -1,19 +1,20 @@
-const { OAuth2Client } = require('google-auth-library')
+import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID)
-const DatabaseManager = require('../data_management/databaseManager')
-const jwt = require('jsonwebtoken');
 
-class AuthenticationManager 
+import DatabaseManager from "../data_management/databaseManager";
+import jwt from 'jsonwebtoken';
+
+export default class AuthenticationManager
 {
-    createNewUser = async (token, dbManager) => {       
+    public static async createNewUser (token: string) {
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.REACT_APP_GOOGLE_CLIENT_ID
         });
 
-        const { name, email, picture } = ticket.getPayload();  
-    
-        return await dbManager.runMutation(
+        const { name, email, picture } = ticket.getPayload();
+
+        return await DatabaseManager.runMutation(
             `
                 MERGE (u:User {email: "${email}"})
                 ON CREATE SET u.name = "${name}", u.picture = "${picture}"
@@ -22,43 +23,41 @@ class AuthenticationManager
             `
         );
     }
-    
-    checkIfUserExists = async (userId, dbManager) => {
-        return await dbManager.runQuery (
+
+    public static async checkIfUserExists (userId: number) {
+        return await DatabaseManager.runQuery (
             `
-                MATCH (u:User) 
-                WHERE ID(u) = ${userId} 
+                MATCH (u:User)
+                WHERE ID(u) = ${userId}
                 RETURN u
             `
         )
     }
 
-    generateAccessToken(user_id, user_email, user_name) {
-        return jwt.sign({user_id, user_email, user_name}, process.env.JWT_SECRET, { expiresIn: '1800s' });
+    public static generateAccessToken(userId: number, userEmail: string, userName: string) {
+        return jwt.sign({userId, userEmail, userName}, process.env.JWT_SECRET, { expiresIn: '1800s' });
     }
 
-    authenticateTokenMiddleware(req, res, next) {
-        const authHeader = req.headers['authorization']
+    public static authenticateTokenMiddleware(req: any, res: any, next: any) {
+        const authHeader = req.headers.authorization
         console.log(authHeader)
         const token = authHeader && authHeader.split(' ')[1]
 
         console.log(`looking at token ${token}`)
-      
+
         if (token === null || token === undefined || token === 'undefined') {
             console.log("no auth token")
             return res.sendStatus(401)
         }
-      
-        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+
+        jwt.verify(token, process.env.JWT_SECRET, (err: any, user: any) => {
             if (err) {
                 console.log(err);
                 return res.sendStatus(403);
-            }      
+            }
             req.user = user
         })
         next()
     }
-      
-}
 
-module.exports = AuthenticationManager
+}

@@ -50,8 +50,7 @@ function App() {
           path: "newschedule",
           element: 
             <div>
-                <NavBar navData={navBarProps}/>
-                <NewSchedule userData={profile}/>
+                <NewSchedule navData={navBarProps}/>
             </div>,
         },
         {

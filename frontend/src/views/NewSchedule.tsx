@@ -4,16 +4,19 @@ import { UserData } from '../controllers/scheduler/types/UserData';
 import ScheduleMaker from './schedule_maker/ScheduleMaker';
 
 type Props = {
-    userData: UserData
+    navData: {
+        profile: UserData;
+        setProfile: (newProfile: UserData) => void;
+    }
 }
 
-function NewSchedule({userData}: Props) {
+function NewSchedule({navData}: Props) {
     const [queryParameters] = useSearchParams()
     const university: string | null = queryParameters.get("university")    
     const degrees: string | null = queryParameters.get("degrees")    
 
     return (
-        <ScheduleMaker university={university} degrees={degrees} userData={userData}/>
+        <ScheduleMaker university={university} degrees={degrees} navData={navData}/>
     )
 }
 
