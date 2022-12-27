@@ -81,7 +81,8 @@ app.get('/tasks', (req, res) => {
 
     dbManager.runQuery(
         `
-            MATCH (:Organization {title:"${orgTitle}"})-[]->(:Executable {title:"${degrees}"})-[*..]->(task: Task)
+            MATCH (:Organization {title:"${orgTitle}"})-[]->(exe:Executable)-[*..]->(task: Task)
+            WHERE ${degrees.split(',').map(str => `exe.title = "${str}"`).join(' OR ')}
             WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
             RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
             ORDER BY ID(task)

@@ -46,8 +46,8 @@ export default class Scheduler {
     }
   }
 
-  public static async initializeObjectivesData(setState: (newState: Objective[]) => void, organizationTitle: string) {
-    setState(await DataEngine.GetDegrees(organizationTitle))
+  public static async initializeObjectivesData(setState: (newState: [Objective, boolean][]) => void, organizationTitle: string) {
+    setState((await DataEngine.GetDegrees(organizationTitle)).map((org) => [org, false]))
   }
 
   public static async initializeOrganizationData(setState: (newState: Organization[]) => void) {
