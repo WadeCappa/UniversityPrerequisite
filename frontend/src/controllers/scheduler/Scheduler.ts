@@ -6,6 +6,7 @@ import { Organization } from './types/Organization';
 import DataEngine from '../apiManager/DataEngine';
 import { Objective } from './types/Objective';
 import { MakerState } from './types/StateConstructor';
+import { DegreeRequirements } from './types/DegreeRequirements';
 
 // this should be a class that encapsulates the state. If you want to output the state you must give a component to the class. 
 
@@ -30,14 +31,22 @@ export default class Scheduler {
   ) {
 
     if (university != null && degrees != null) {
-      const response = await DataEngine.GetInPathCourses(university, degrees, jwt);
+      const response: any = await DataEngine.GetInPathCourses(university, degrees, jwt);
+
+      const lookupTable = response["taskTable"]
     
-      for (const key in response) {
-        response[key].focus = 0;
+      for (const key in lookupTable) {
+        lookupTable[key].focus = 0;
       }
 
+      console.log(response)
+
       Scheduler.notifyListeners({
-        state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]], degrees.split(',').map(d => Number(d).valueOf())),
+        state: makeState(
+          lookupTable, 
+          [Object.keys(lookupTable).map(key => Number(key)),[],[],[],[],[],[],[],[]], 
+          response["degreeRequirements"] as DegreeRequirements[]
+        ),
         listeners: oldState.listeners
       });
     }
@@ -90,28 +99,42 @@ export default class Scheduler {
   
   public static addSemester(state: SchedulerState) {
     Scheduler.notifyListeners({
-      state: makeState(
-        state.state.taskTable, 
-        state.state.keyLists.concat([[]]),
-        state.state.degreeIDs
-      ),
+      state: {
+        ...state.state,
+        keyLists: state.state.keyLists.concat([[]])
+      },
       listeners: state.listeners
     })
   }
   
   public static removeSemester(state: SchedulerState) {
     Scheduler.notifyListeners({
-      state: makeState(
-        state.state.taskTable, 
-        state.state.keyLists.map((list, index) => {
-          if (index == 0) {
-            return list.concat(state.state.keyLists[state.state.keyLists.length - 1])
-          } 
-          else {
-            return list
+      state: {
+        ...state.state,
+        keyLists: 
+          state.state.keyLists.map((list, index) => {
+            if (index == 0) {
+              return list.concat(state.state.keyLists[state.state.keyLists.length - 1])
+            } 
+            else {
+              return list
+          }}).slice(0, -1)
+      },
+      listeners: state.listeners
+    })
+
+    Scheduler.notifyListeners({
+      state: {
+        ...state.state,
+        keyLists:         
+          state.state.keyLists.map((list, index) => {
+            if (index == 0) {
+              return list.concat(state.state.keyLists[state.state.keyLists.length - 1])
+            } 
+            else {
+              return list
           }}).slice(0, -1),
-        state.state.degreeIDs
-      ),
+      },
       listeners: state.listeners
     })
   }
@@ -124,18 +147,18 @@ export default class Scheduler {
 
   public static clearSemesters(state: SchedulerState) {
     Scheduler.notifyListeners({
-      state: makeState(
-        state.state.taskTable,
-        state.state.keyLists.map((_, index) => {
-          if (index == 0) {
-            return state.state.keyLists.flat()
-          }
-          else {
-            return []
-          }
+      state: {
+        ...state.state,
+        keyLists:         
+          state.state.keyLists.map((_, index) => {
+            if (index == 0) {
+              return state.state.keyLists.flat()
+            }
+            else {
+              return []
+            }
         }),
-        state.state.degreeIDs
-      ),
+      },
       listeners: state.listeners
     })
   }
@@ -151,11 +174,7 @@ export default class Scheduler {
     })
 
     Scheduler.notifyListeners({
-      state: makeState(
-        newTaskTable,
-        state.state.keyLists,
-        state.state.degreeIDs,
-      ),
+      state: {...state.state, taskTable: newTaskTable},
       listeners: state.listeners
     })
   }
@@ -181,6 +200,6 @@ export default class Scheduler {
       })
     })
 
-    return makeState(newTaskTable, state.state.keyLists, state.state.degreeIDs)
+    return {...state.state, taskTable: newTaskTable}
   }
 }

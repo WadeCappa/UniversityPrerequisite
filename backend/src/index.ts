@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser"
 
 import DatabaseManager from "./data_management/databaseManager";
 import AuthenticationManager from "./user_management/authenticationManager";
-import TypeBuilder from "./data_management/typeBuilder";
+import TypeBuilder, { LookupTable, Task } from "./data_management/typeBuilder";
 
 const app = express();
 const port = process.env.PORT;
@@ -71,12 +71,12 @@ app.get('/objectives', (req: any, res: any) => {
     })
 })
 
-app.get('/tasks', (req: any, res: any) => {
+app.get('/tasks', async (req: any, res: any) => {
     // make sure values exist before running query
     const degrees: string = req.query.for;
     const orgTitle: string = req.query.at
 
-    DatabaseManager.runQuery(
+    const lookupTable: LookupTable = TypeBuilder.buildLookupTable((await DatabaseManager.runQuery(
         `
             MATCH (:Organization {title:"${orgTitle}"})-[]->(exe:Executable)-[*..]->(task: Task)
             WHERE ${degrees.split(',').map(id => `ID(exe) = ${id}`).join(' OR ')}
@@ -84,10 +84,22 @@ app.get('/tasks', (req: any, res: any) => {
             RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
             ORDER BY ID(task)
         `
-    ).then((output) => {
-        // make sure r is of correct type
-        res.json(TypeBuilder.buildLookupTable(output.map(r => TypeBuilder.buildTask(r))));
-    })
+    )).map(r => TypeBuilder.buildTask(r)));
+
+    const degreeRequirements = (await DatabaseManager.runQuery(
+        `
+            MATCH (exe:Executable)-[]->()-[]->(task: Task)
+            WHERE ${degrees.split(',').map(id => `ID(exe) = ${id}`).join(' OR ')}
+            WITH exe, [(x:Path)<-[]-(exe) | [(y:Task)<-[]-(x) | ID(y)]] AS children
+            RETURN distinct ID(exe) as id, exe.title as title, exe.description as description, children
+            ORDER BY ID(exe)
+        `
+    ))
+
+    res.json({
+        taskTable: lookupTable,
+        degreeRequirements: degreeRequirements
+    });
 })
 
 app.post('/saveSchedule', AuthenticationManager.authenticateTokenMiddleware, (req: any, res: any) => {

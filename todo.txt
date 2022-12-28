@@ -44,4 +44,14 @@ USES THAT MUST BE SUPPORTED IN MVP:
 
 
 
-sudo -u postgres psql	
+You need to redesign the whole system, get your berrings again. You're not certian how best to proceed, break the system down into its full component parts (this is increadible practice by the way, and you will have plenty of time tomorrow to do this) and then build it back up to accomplish all of the functionality you want. 
+
+First: make a list of requirements. You've done this before so it shouldn't be hard to update this list. 
+
+Second: draw up some general archetecture diagrams to get a high-level overview of the system. 
+
+Third: start drawing up some data flow diagrams, figure out what data needs to be passed. 
+
+Forth: Draw out some component diagrams, not classes exactly, but each logical block that can be decoupled from the other components. Figure out what interfaces these need and how they interact. 
+
+Fifth: Keep building. You are close to being done.

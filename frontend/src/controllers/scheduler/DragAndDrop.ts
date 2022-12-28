@@ -17,18 +17,18 @@ export const drop = (event: any, newLocation: number, state: SchedulerState): vo
     
     const transferData = JSON.parse(event.dataTransfer.getData('text'));
 
-    const newState = makeState(
-        state.state.taskTable,
-        state.state.keyLists.map((l, i) => {
-            if (newLocation === transferData.originIndex) {return l}
-            if (i === newLocation) {return l.concat(transferData.targetID)}
-            if (i === transferData.originIndex) {
-                return l.filter(id => id !== transferData.targetID)
-            }
-            else {return l}
+    const newState = {
+        ...state.state,
+        keyLists:         
+                state.state.keyLists.map((l, i) => {
+                if (newLocation === transferData.originIndex) {return l}
+                if (i === newLocation) {return l.concat(transferData.targetID)}
+                if (i === transferData.originIndex) {
+                    return l.filter(id => id !== transferData.targetID)
+                }
+                else {return l}
         }),
-        state.state.degreeIDs
-    )
+    }
 
     Scheduler.notifyListeners({state: newState, listeners: state.listeners})
 

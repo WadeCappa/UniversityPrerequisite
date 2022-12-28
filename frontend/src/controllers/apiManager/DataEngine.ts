@@ -56,7 +56,7 @@ export default class DataEngine {
             body: JSON.stringify({
                 token: userToken,
                 schedule: state.keyLists,
-                degrees: state.degreeIDs
+                degrees: state.degreeReqs
             }),
         } as Request);
     }
