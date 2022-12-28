@@ -40,7 +40,6 @@ export default class AuthenticationManager
 
     public static authenticateTokenMiddleware(req: any, res: any, next: any) {
         const authHeader = req.headers.authorization
-        console.log(authHeader)
         const token = authHeader && authHeader.split(' ')[1]
 
         console.log(`looking at token ${token}`)

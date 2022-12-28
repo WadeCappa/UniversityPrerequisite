@@ -1,5 +1,5 @@
 export type Objective = {
-    orgID: number,
+    id: number,
     title: string, 
     slotsPerBucket: number,
     description: string, 

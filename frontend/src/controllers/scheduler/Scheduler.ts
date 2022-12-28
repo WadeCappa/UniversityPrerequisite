@@ -17,7 +17,7 @@ export default class Scheduler {
 
   public static initializeScheduleMakerState(listeners: (newState: SchedulerState) => void) {
     return {
-      state: makeState({}, [[], [], [], [], [], [], [], [], []]),
+      state: makeState({}, [[], [], [], [], [], [], [], [], []], []),
       listeners: [listeners]
     }
   } 
@@ -37,7 +37,7 @@ export default class Scheduler {
       }
 
       Scheduler.notifyListeners({
-        state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]]),
+        state: makeState(response, [Object.keys(response).map(key => Number(key)),[],[],[],[],[],[],[],[]], degrees.split(',').map(d => Number(d).valueOf())),
         listeners: oldState.listeners
       });
     }
@@ -52,6 +52,10 @@ export default class Scheduler {
 
   public static async initializeOrganizationData(setState: (newState: Organization[]) => void) {
     setState(await DataEngine.GetOrganizations())
+  }
+
+  public static async saveSchedule(state: MakerState, userToken: string) {
+    await DataEngine.SaveSchedule(state, userToken)
   }
   
   public static visualizeFocus(focus: Focus): string {
@@ -88,7 +92,8 @@ export default class Scheduler {
     Scheduler.notifyListeners({
       state: makeState(
         state.state.taskTable, 
-        state.state.keyLists.concat([[]])
+        state.state.keyLists.concat([[]]),
+        state.state.degreeIDs
       ),
       listeners: state.listeners
     })
@@ -104,7 +109,8 @@ export default class Scheduler {
           } 
           else {
             return list
-          }}).slice(0, -1)
+          }}).slice(0, -1),
+        state.state.degreeIDs
       ),
       listeners: state.listeners
     })
@@ -127,8 +133,37 @@ export default class Scheduler {
           else {
             return []
           }
-        })
+        }),
+        state.state.degreeIDs
       ),
+      listeners: state.listeners
+    })
+  }
+  
+  public static onTaskMouseEnter(taskID: number, state: SchedulerState) {
+    const newTaskTable = {...state.state.taskTable}
+    newTaskTable[taskID].focus = 1;
+
+    newTaskTable[taskID].children.forEach(paths => {
+      paths.forEach(childID => {
+        newTaskTable[childID].focus = 2;
+      })
+    })
+
+    Scheduler.notifyListeners({
+      state: makeState(
+        newTaskTable,
+        state.state.keyLists,
+        state.state.degreeIDs,
+      ),
+      listeners: state.listeners
+    })
+  }
+
+  public static onTaskMouseLeave(taskID: number, state: SchedulerState) {
+
+    Scheduler.notifyListeners({
+      state: Scheduler.resetFocus(state),
       listeners: state.listeners
     })
   }
@@ -146,33 +181,6 @@ export default class Scheduler {
       })
     })
 
-    return makeState(newTaskTable, state.state.keyLists)
-  }
-  
-  public static onTaskMouseEnter(taskID: number, state: SchedulerState) {
-    const newTaskTable = {...state.state.taskTable}
-    newTaskTable[taskID].focus = 1;
-
-    newTaskTable[taskID].children.forEach(paths => {
-      paths.forEach(childID => {
-        newTaskTable[childID].focus = 2;
-      })
-    })
-
-    Scheduler.notifyListeners({
-      state: makeState(
-        newTaskTable,
-        state.state.keyLists
-      ),
-      listeners: state.listeners
-    })
-  }
-
-  public static onTaskMouseLeave(taskID: number, state: SchedulerState) {
-
-    Scheduler.notifyListeners({
-      state: Scheduler.resetFocus(state),
-      listeners: state.listeners
-    })
+    return makeState(newTaskTable, state.state.keyLists, state.state.degreeIDs)
   }
 }

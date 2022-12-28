@@ -26,7 +26,8 @@ export const drop = (event: any, newLocation: number, state: SchedulerState): vo
                 return l.filter(id => id !== transferData.targetID)
             }
             else {return l}
-        })
+        }),
+        state.state.degreeIDs
     )
 
     Scheduler.notifyListeners({state: newState, listeners: state.listeners})

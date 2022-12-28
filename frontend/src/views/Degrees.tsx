@@ -33,7 +33,7 @@ function Degrees({userData}: Props) {
         <div>
             <div className='header'>
                 <h1>{organization}</h1>
-                <Link to={`/newschedule?university=${organization}&degrees=${objectives.filter(([_, c]) => c).map(([ob, _]) => ob.title).join()}`}>
+                <Link to={`/newschedule?university=${organization}&degrees=${objectives.filter(([_, c]) => c).map(([ob, _]) => ob.id).join()}`}>
                     <button className="slot" onClick={() => {}}>Build New Schedule</button>
                 </Link>
                 <div>
@@ -41,8 +41,8 @@ function Degrees({userData}: Props) {
                     <div className="list-container">
                         {objectives.map(([ob, checked], index) => {
                             return (
-                                <div key={ob.orgID}>
-                                    <input value={ob.orgID} type="checkbox" checked={checked} onChange={() => setNewTargetObjectives(index)} />
+                                <div key={ob.id}>
+                                    <input value={ob.id} type="checkbox" checked={checked} onChange={() => setNewTargetObjectives(index)} />
                                     <span>{ob.title}</span>
                                 </div>
                             )

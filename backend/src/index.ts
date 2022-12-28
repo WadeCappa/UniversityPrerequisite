@@ -79,7 +79,7 @@ app.get('/tasks', (req: any, res: any) => {
     DatabaseManager.runQuery(
         `
             MATCH (:Organization {title:"${orgTitle}"})-[]->(exe:Executable)-[*..]->(task: Task)
-            WHERE ${degrees.split(',').map(str => `exe.title = "${str}"`).join(' OR ')}
+            WHERE ${degrees.split(',').map(id => `ID(exe) = ${id}`).join(' OR ')}
             WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
             RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
             ORDER BY ID(task)
@@ -88,6 +88,10 @@ app.get('/tasks', (req: any, res: any) => {
         // make sure r is of correct type
         res.json(TypeBuilder.buildLookupTable(output.map(r => TypeBuilder.buildTask(r))));
     })
+})
+
+app.post('/saveSchedule', AuthenticationManager.authenticateTokenMiddleware, (req: any, res: any) => {
+    console.log(req.body)
 })
 
 app.listen(port, () => console.log(`Listening on ${port}!`));
