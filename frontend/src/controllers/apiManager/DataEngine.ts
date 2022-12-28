@@ -56,7 +56,7 @@ export default class DataEngine {
             body: JSON.stringify({
                 token: userToken,
                 schedule: state.keyLists,
-                degrees: state.degreeReqs
+                degrees: state.degreeReqs.map(d => d.id)
             }),
         } as Request);
     }

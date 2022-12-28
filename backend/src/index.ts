@@ -9,7 +9,8 @@ import cookieParser from "cookie-parser"
 
 import DatabaseManager from "./data_management/databaseManager";
 import AuthenticationManager from "./user_management/authenticationManager";
-import TypeBuilder, { LookupTable, Task } from "./data_management/typeBuilder";
+import TypeBuilder, { DegreeRequirement, LookupTable, Task, User } from "./data_management/typeBuilder";
+import DataHandler from "./dataHandler";
 
 const app = express();
 const port = process.env.PORT;
@@ -27,9 +28,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.post('/auth/login', (req: any, res: any) => {
-    AuthenticationManager.createNewUser(req.body.token).then((user: any) => {
+    AuthenticationManager.createNewUser(req.body.token).then((user: User) => {
         res.status(201)
-        res.json(AuthenticationManager.generateAccessToken(user.userId, user.email, user.name))
+        res.json(AuthenticationManager.generateAccessToken(user.id))
     });
 })
 
@@ -73,28 +74,11 @@ app.get('/objectives', (req: any, res: any) => {
 
 app.get('/tasks', async (req: any, res: any) => {
     // make sure values exist before running query
-    const degrees: string = req.query.for;
+    const degrees: number[] = req.query.for.split(',').map((d:any) => Number(d));
     const orgTitle: string = req.query.at
 
-    const lookupTable: LookupTable = TypeBuilder.buildLookupTable((await DatabaseManager.runQuery(
-        `
-            MATCH (:Organization {title:"${orgTitle}"})-[]->(exe:Executable)-[*..]->(task: Task)
-            WHERE ${degrees.split(',').map(id => `ID(exe) = ${id}`).join(' OR ')}
-            WITH task, [(task)<-[]-()<-[]-(x:Task) | ID(x)] AS parents,  [(x:Path)<-[]-(task) | [(y:Task)<-[]-(x) | ID(y)]] AS children
-            RETURN distinct ID(task) as id, task.subject as subject, task.number as number, task.weight as weight, task.title as title, task.description as description, parents, children
-            ORDER BY ID(task)
-        `
-    )).map(r => TypeBuilder.buildTask(r)));
-
-    const degreeRequirements = (await DatabaseManager.runQuery(
-        `
-            MATCH (exe:Executable)-[]->()-[]->(task: Task)
-            WHERE ${degrees.split(',').map(id => `ID(exe) = ${id}`).join(' OR ')}
-            WITH exe, [(x:Path)<-[]-(exe) | [(y:Task)<-[]-(x) | ID(y)]] AS children
-            RETURN distinct ID(exe) as id, exe.title as title, exe.description as description, children
-            ORDER BY ID(exe)
-        `
-    ))
+    const lookupTable: LookupTable = await DataHandler.GetLookupTable(orgTitle, degrees)
+    const degreeRequirements: DegreeRequirement[] = await DataHandler.GetDegreeRequirements(degrees)
 
     res.json({
         taskTable: lookupTable,
@@ -103,7 +87,11 @@ app.get('/tasks', async (req: any, res: any) => {
 })
 
 app.post('/saveSchedule', AuthenticationManager.authenticateTokenMiddleware, (req: any, res: any) => {
-    console.log(req.body)
+    const degreeIDs: number[] = req.body.degrees 
+    const schedule: number[][] = req.body.schedule 
+    const userId: number = req.user
+
+    DataHandler.InitializeSchedule(degreeIDs, schedule, userId)
 })
 
 app.listen(port, () => console.log(`Listening on ${port}!`));

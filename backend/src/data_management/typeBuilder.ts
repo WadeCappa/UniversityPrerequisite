@@ -24,6 +24,18 @@ export type LookupTable = {
     [id: number]: Task;
 }
 
+export type DegreeRequirement = {
+    id: number,
+    children: number[],
+    title: string
+}
+
+export type User = {
+    id: number,
+    name: string,
+    email: string
+}
+
 export default class TypeBuilder
 {
     public static buildOrganization(record: any): Organization {
@@ -58,5 +70,21 @@ export default class TypeBuilder
         const res = {} as LookupTable
         tasks.forEach(t => res[t.id] = t)
         return res
+    }
+
+    public static buildDegreeRequirement(record: any): DegreeRequirement {
+        return {
+            id: record.get("id").low,
+            children: record.get("children").map((c: any) => c.low),
+            title: record.get("title")
+        }
+    }
+
+    public static buildUser(record: any): User {
+        return {
+            id: record.get("userId").low,
+            name: record.get("name"),
+            email: record.get("email")
+        }
     }
 }
